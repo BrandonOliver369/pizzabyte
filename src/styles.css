@@ -1,1 +1,246 @@
-/* You can add global styles to this file, and also import other style files */
+/* ==========================================================================
+   PizzaByte Global Styles & Theme — Black, Red & White Luxury Atelier
+   ========================================================================== */
+
+:root {
+  /* Paleta Exclusiva: Negro, Rojo y Blanco */
+  --primary: #dc2626;
+  --primary-hover: #ef4444;
+  --primary-light: rgba(220, 38, 38, 0.15);
+  --primary-dark: #991b1b;
+  --secondary: #dc2626;
+  --secondary-hover: #ef4444;
+  --accent-red: #dc2626;
+  --accent-red-light: rgba(220, 38, 38, 0.12);
+  --accent-gold: #dc2626;
+  --accent-gold-light: rgba(220, 38, 38, 0.12);
+  --accent-green: #ffffff;
+  --accent-green-bg: rgba(255, 255, 255, 0.08);
+  --accent-purple: #ffffff;
+  --accent-blue: #ffffff;
+
+  /* Superficies & Fondos Oscuros Minimalistas (Pitch Black) */
+  --bg-main: #000000;
+  --bg-surface: #0a0a0a;
+  --bg-card: rgba(14, 14, 14, 0.88);
+  --bg-muted: rgba(255, 255, 255, 0.04);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  --border-red: rgba(220, 38, 38, 0.35);
+  --border-gold: rgba(220, 38, 38, 0.35);
+  --border-focus: #dc2626;
+
+  /* Tipografía de Prestigio (Blanco & Rojo) */
+  --text-main: #ffffff;
+  --text-muted: #94a3b8;
+  --text-light: #64748b;
+  --text-red: #ff334b;
+  --text-gold: #ff334b;
+  --text-white: #ffffff;
+
+  /* Radios & Curvaturas Geométricas Suaves */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 26px;
+  --radius-full: 9999px;
+
+  /* Sombras y Auras Luminiscentes en Rojo y Negro */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.65);
+  --shadow-lg: 0 16px 36px rgba(0, 0, 0, 0.8);
+  --shadow-xl: 0 24px 50px -10px rgba(0, 0, 0, 0.9), 0 0 35px rgba(220, 38, 38, 0.18);
+  --shadow-glow: 0 0 25px rgba(220, 38, 38, 0.35);
+
+  /* Familias Tipográficas */
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Outfit', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  min-height: 100vh;
+  font-family: var(--font-body);
+  color: var(--text-main);
+  background-color: var(--bg-main);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+}
+
+button {
+  font-family: var(--font-body);
+  cursor: pointer;
+  border: none;
+  background: none;
+  transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+input, select, textarea {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+}
+
+/* Scrollbar Minimalista Oscuro */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+::-webkit-scrollbar-thumb {
+  background: #262626;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #dc2626;
+}
+
+/* Etiquetas de Código */
+.code-inline {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #ff334b;
+  padding: 0.15em 0.45em;
+  border-radius: 4px;
+  border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+/* ==========================================================================
+   Animaciones Suaves & Micro-interacciones (Cubic-Bezier Easing)
+   ========================================================================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes subtleFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes redGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(220, 38, 38, 0.45);
+  }
+}
+
+@keyframes modalBackdropIn {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(16px);
+  }
+}
+
+@keyframes modalPopIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Clases Utilitarias */
+.animate-fade-in {
+  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-float-slow {
+  animation: subtleFloat 5s ease-in-out infinite;
+}
+
+.animate-float-fast {
+  animation: subtleFloat 3.5s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: redGlow 3s infinite ease-in-out;
+}
+
+/* Botón con Destello Rojo de Prestigio */
+.btn-shimmer {
+  background: linear-gradient(90deg, #dc2626 0%, #ff4d63 50%, #dc2626 100%);
+  background-size: 200% auto;
+  color: #ffffff !important;
+  font-weight: 700;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-shimmer:hover {
+  background-position: right center;
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Tarjetas con Efecto Glassmorphism Oscuro */
+.glass-card {
+  background: rgba(14, 14, 14, 0.88);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-dark {
+  background: rgba(10, 10, 10, 0.94);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+.hover-lift {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hover-lift:hover {
+  transform: translateY(-4px);
+  border-color: rgba(220, 38, 38, 0.45) !important;
+  box-shadow: var(--shadow-xl);
+}
+

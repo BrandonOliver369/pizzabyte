@@ -1,344 +1,1113 @@
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * The content below * * * * * * * * * * * -->
-<!-- * * * * * * * * * * is only a placeholder * * * * * * * * * * -->
-<!-- * * * * * * * * * * and can be replaced.  * * * * * * * * * * -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<!-- * * * * * * * * * Delete the template below * * * * * * * * * -->
-<!-- * * * * * * * to get started with your project! * * * * * * * -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+<div class="app-layout">
+  <!-- Navbar Superior de la Pizzería -->
+  <app-navbar 
+    [tabActiva]="tabActiva()" 
+    (tabSeleccionada)="cambiarTab($event)">
+  </app-navbar>
 
-<style>
-  :host {
-    --bright-blue: oklch(51.01% 0.274 263.83);
-    --electric-violet: oklch(53.18% 0.28 296.97);
-    --french-violet: oklch(47.66% 0.246 305.88);
-    --vivid-pink: oklch(69.02% 0.277 332.77);
-    --hot-red: oklch(61.42% 0.238 15.34);
-    --orange-red: oklch(63.32% 0.24 31.68);
-
-    --gray-900: oklch(19.37% 0.006 300.98);
-    --gray-700: oklch(36.98% 0.014 302.71);
-    --gray-400: oklch(70.9% 0.015 304.04);
-
-    --red-to-pink-to-purple-vertical-gradient: linear-gradient(
-      180deg,
-      var(--orange-red) 0%,
-      var(--vivid-pink) 50%,
-      var(--electric-violet) 100%
-    );
-
-    --red-to-pink-to-purple-horizontal-gradient: linear-gradient(
-      90deg,
-      var(--orange-red) 0%,
-      var(--vivid-pink) 50%,
-      var(--electric-violet) 100%
-    );
-
-    --pill-accent: var(--bright-blue);
-
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-      Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
-      "Segoe UI Symbol";
-    box-sizing: border-box;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    display: block;
-    height: 100dvh;
-  }
-
-  h1 {
-    font-size: 3.125rem;
-    color: var(--gray-900);
-    font-weight: 500;
-    line-height: 100%;
-    letter-spacing: -0.125rem;
-    margin: 0;
-    font-family: "Inter Tight", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-      Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
-      "Segoe UI Symbol";
-  }
-
-  p {
-    margin: 0;
-    color: var(--gray-700);
-  }
-
-  main {
-    width: 100%;
-    min-height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 1rem;
-    box-sizing: inherit;
-    position: relative;
-  }
-
-  .angular-logo {
-    max-width: 9.2rem;
-  }
-
-  .content {
-    display: flex;
-    justify-content: space-around;
-    width: 100%;
-    max-width: 700px;
-    margin-bottom: 3rem;
-  }
-
-  .content h1 {
-    margin-top: 1.75rem;
-  }
-
-  .content p {
-    margin-top: 1.5rem;
-  }
-
-  .divider {
-    width: 1px;
-    background: var(--red-to-pink-to-purple-vertical-gradient);
-    margin-inline: 0.5rem;
-  }
-
-  .pill-group {
-    display: flex;
-    flex-direction: column;
-    align-items: start;
-    flex-wrap: wrap;
-    gap: 1.25rem;
-  }
-
-  .pill {
-    display: flex;
-    align-items: center;
-    --pill-accent: var(--bright-blue);
-    background: color-mix(in srgb, var(--pill-accent) 5%, transparent);
-    color: var(--pill-accent);
-    padding-inline: 0.75rem;
-    padding-block: 0.375rem;
-    border-radius: 2.75rem;
-    border: 0;
-    transition: background 0.3s ease;
-    font-family: var(--inter-font);
-    font-size: 0.875rem;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 1.4rem;
-    letter-spacing: -0.00875rem;
-    text-decoration: none;
-    white-space: nowrap;
-  }
-
-  .pill:hover {
-    background: color-mix(in srgb, var(--pill-accent) 15%, transparent);
-  }
-
-  .pill-group .pill:nth-child(6n + 1) {
-    --pill-accent: var(--bright-blue);
-  }
-  .pill-group .pill:nth-child(6n + 2) {
-    --pill-accent: var(--electric-violet);
-  }
-  .pill-group .pill:nth-child(6n + 3) {
-    --pill-accent: var(--french-violet);
-  }
-
-  .pill-group .pill:nth-child(6n + 4),
-  .pill-group .pill:nth-child(6n + 5),
-  .pill-group .pill:nth-child(6n + 6) {
-    --pill-accent: var(--hot-red);
-  }
-
-  .pill-group svg {
-    margin-inline-start: 0.25rem;
-  }
-
-  .social-links {
-    display: flex;
-    align-items: center;
-    gap: 0.73rem;
-    margin-top: 1.5rem;
-  }
-
-  .social-links path {
-    transition: fill 0.3s ease;
-    fill: var(--gray-400);
-  }
-
-  .social-links a:hover svg path {
-    fill: var(--gray-900);
-  }
-
-  @media screen and (max-width: 650px) {
-    .content {
-      flex-direction: column;
-      width: max-content;
-    }
-
-    .divider {
-      height: 1px;
-      width: 100%;
-      background: var(--red-to-pink-to-purple-horizontal-gradient);
-      margin-block: 1.5rem;
-    }
-  }
-</style>
-
-<main class="main">
-  <div class="content">
-    <div class="left-side">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 982 239"
-        fill="none"
-        class="angular-logo"
-      >
-        <g clip-path="url(#a)">
-          <path
-            fill="url(#b)"
-            d="M388.676 191.625h30.849L363.31 31.828h-35.758l-56.215 159.797h30.848l13.174-39.356h60.061l13.256 39.356Zm-65.461-62.675 21.602-64.311h1.227l21.602 64.311h-44.431Zm126.831-7.527v70.202h-28.23V71.839h27.002v20.374h1.392c2.782-6.71 7.2-12.028 13.255-15.956 6.056-3.927 13.584-5.89 22.503-5.89 8.264 0 15.465 1.8 21.684 5.318 6.137 3.518 10.964 8.673 14.319 15.382 3.437 6.71 5.074 14.81 4.992 24.383v76.175h-28.23v-71.92c0-8.019-2.046-14.237-6.219-18.819-4.173-4.5-9.819-6.791-17.102-6.791-4.91 0-9.328 1.063-13.174 3.272-3.846 2.128-6.792 5.237-9.001 9.328-2.046 4.009-3.191 8.918-3.191 14.728ZM589.233 239c-10.147 0-18.82-1.391-26.103-4.091-7.282-2.7-13.092-6.382-17.511-10.964-4.418-4.582-7.528-9.655-9.164-15.219l25.448-6.136c1.145 2.372 2.782 4.663 4.991 6.954 2.209 2.291 5.155 4.255 8.837 5.81 3.683 1.554 8.428 2.291 14.074 2.291 8.019 0 14.647-1.964 19.884-5.81 5.237-3.845 7.856-10.227 7.856-19.064v-22.665h-1.391c-1.473 2.946-3.601 5.892-6.383 9.001-2.782 3.109-6.464 5.645-10.965 7.691-4.582 2.046-10.228 3.109-17.101 3.109-9.165 0-17.511-2.209-25.039-6.545-7.446-4.337-13.42-10.883-17.757-19.474-4.418-8.673-6.628-19.473-6.628-32.565 0-13.091 2.21-24.301 6.628-33.383 4.419-9.082 10.311-15.955 17.839-20.7 7.528-4.746 15.874-7.037 25.039-7.037 7.037 0 12.846 1.145 17.347 3.518 4.582 2.373 8.182 5.236 10.883 8.51 2.7 3.272 4.746 6.382 6.137 9.327h1.554v-19.8h27.821v121.749c0 10.228-2.454 18.737-7.364 25.447-4.91 6.709-11.538 11.7-20.048 15.055-8.509 3.355-18.165 4.991-28.884 4.991Zm.245-71.266c5.974 0 11.047-1.473 15.302-4.337 4.173-2.945 7.446-7.118 9.573-12.519 2.21-5.482 3.274-12.027 3.274-19.637 0-7.609-1.064-14.155-3.274-19.8-2.127-5.646-5.318-10.064-9.491-13.255-4.174-3.11-9.329-4.746-15.384-4.746s-11.537 1.636-15.792 4.91c-4.173 3.272-7.365 7.772-9.492 13.418-2.128 5.727-3.191 12.191-3.191 19.392 0 7.2 1.063 13.745 3.273 19.228 2.127 5.482 5.318 9.736 9.573 12.764 4.174 3.027 9.41 4.582 15.629 4.582Zm141.56-26.51V71.839h28.23v119.786h-27.412v-21.273h-1.227c-2.7 6.709-7.119 12.191-13.338 16.446-6.137 4.255-13.747 6.382-22.748 6.382-7.855 0-14.81-1.718-20.783-5.237-5.974-3.518-10.72-8.591-14.075-15.382-3.355-6.709-5.073-14.891-5.073-24.464V71.839h28.312v71.921c0 7.609 2.046 13.664 6.219 18.083 4.173 4.5 9.655 6.709 16.365 6.709 4.173 0 8.183-.982 12.111-3.028 3.927-2.045 7.118-5.072 9.655-9.082 2.537-4.091 3.764-9.164 3.764-15.218Zm65.707-109.395v159.796h-28.23V31.828h28.23Zm44.841 162.169c-7.61 0-14.402-1.391-20.457-4.091-6.055-2.7-10.883-6.791-14.32-12.109-3.518-5.319-5.237-11.946-5.237-19.801 0-6.791 1.228-12.355 3.765-16.773 2.536-4.419 5.891-7.937 10.228-10.637 4.337-2.618 9.164-4.664 14.647-6.055 5.4-1.391 11.046-2.373 16.856-3.027 7.037-.737 12.683-1.391 17.102-1.964 4.337-.573 7.528-1.555 9.574-2.782 1.963-1.309 3.027-3.273 3.027-5.973v-.491c0-5.891-1.718-10.391-5.237-13.664-3.518-3.191-8.51-4.828-15.056-4.828-6.955 0-12.356 1.473-16.447 4.5-4.009 3.028-6.71 6.546-8.183 10.719l-26.348-3.764c2.046-7.282 5.483-13.336 10.31-18.328 4.746-4.909 10.638-8.59 17.511-11.045 6.955-2.455 14.565-3.682 22.912-3.682 5.809 0 11.537.654 17.265 2.045s10.965 3.6 15.711 6.71c4.746 3.109 8.51 7.282 11.455 12.6 2.864 5.318 4.337 11.946 4.337 19.883v80.184h-27.166v-16.446h-.9c-1.719 3.355-4.092 6.464-7.201 9.328-3.109 2.864-6.955 5.237-11.619 6.955-4.828 1.718-10.229 2.536-16.529 2.536Zm7.364-20.701c5.646 0 10.556-1.145 14.729-3.354 4.173-2.291 7.364-5.237 9.655-9.001 2.292-3.763 3.355-7.854 3.355-12.273v-14.155c-.9.737-2.373 1.391-4.5 2.046-2.128.654-4.419 1.145-7.037 1.636-2.619.491-5.155.9-7.692 1.227-2.537.328-4.746.655-6.628.901-4.173.572-8.019 1.472-11.292 2.781-3.355 1.31-5.973 3.11-7.855 5.401-1.964 2.291-2.864 5.318-2.864 8.918 0 5.237 1.882 9.164 5.728 11.782 3.682 2.782 8.51 4.091 14.401 4.091Zm64.643 18.328V71.839h27.412v19.965h1.227c2.21-6.955 5.974-12.274 11.292-16.038 5.319-3.763 11.456-5.645 18.329-5.645 1.555 0 3.355.082 5.237.163 1.964.164 3.601.328 4.91.573v25.938c-1.227-.41-3.109-.819-5.646-1.146a58.814 58.814 0 0 0-7.446-.49c-5.155 0-9.738 1.145-13.829 3.354-4.091 2.209-7.282 5.236-9.655 9.164-2.373 3.927-3.519 8.427-3.519 13.5v70.448h-28.312ZM222.077 39.192l-8.019 125.923L137.387 0l84.69 39.192Zm-53.105 162.825-57.933 33.056-57.934-33.056 11.783-28.556h92.301l11.783 28.556ZM111.039 62.675l30.357 73.803H80.681l30.358-73.803ZM7.937 165.115 0 39.192 84.69 0 7.937 165.115Z"
-          />
-          <path
-            fill="url(#c)"
-            d="M388.676 191.625h30.849L363.31 31.828h-35.758l-56.215 159.797h30.848l13.174-39.356h60.061l13.256 39.356Zm-65.461-62.675 21.602-64.311h1.227l21.602 64.311h-44.431Zm126.831-7.527v70.202h-28.23V71.839h27.002v20.374h1.392c2.782-6.71 7.2-12.028 13.255-15.956 6.056-3.927 13.584-5.89 22.503-5.89 8.264 0 15.465 1.8 21.684 5.318 6.137 3.518 10.964 8.673 14.319 15.382 3.437 6.71 5.074 14.81 4.992 24.383v76.175h-28.23v-71.92c0-8.019-2.046-14.237-6.219-18.819-4.173-4.5-9.819-6.791-17.102-6.791-4.91 0-9.328 1.063-13.174 3.272-3.846 2.128-6.792 5.237-9.001 9.328-2.046 4.009-3.191 8.918-3.191 14.728ZM589.233 239c-10.147 0-18.82-1.391-26.103-4.091-7.282-2.7-13.092-6.382-17.511-10.964-4.418-4.582-7.528-9.655-9.164-15.219l25.448-6.136c1.145 2.372 2.782 4.663 4.991 6.954 2.209 2.291 5.155 4.255 8.837 5.81 3.683 1.554 8.428 2.291 14.074 2.291 8.019 0 14.647-1.964 19.884-5.81 5.237-3.845 7.856-10.227 7.856-19.064v-22.665h-1.391c-1.473 2.946-3.601 5.892-6.383 9.001-2.782 3.109-6.464 5.645-10.965 7.691-4.582 2.046-10.228 3.109-17.101 3.109-9.165 0-17.511-2.209-25.039-6.545-7.446-4.337-13.42-10.883-17.757-19.474-4.418-8.673-6.628-19.473-6.628-32.565 0-13.091 2.21-24.301 6.628-33.383 4.419-9.082 10.311-15.955 17.839-20.7 7.528-4.746 15.874-7.037 25.039-7.037 7.037 0 12.846 1.145 17.347 3.518 4.582 2.373 8.182 5.236 10.883 8.51 2.7 3.272 4.746 6.382 6.137 9.327h1.554v-19.8h27.821v121.749c0 10.228-2.454 18.737-7.364 25.447-4.91 6.709-11.538 11.7-20.048 15.055-8.509 3.355-18.165 4.991-28.884 4.991Zm.245-71.266c5.974 0 11.047-1.473 15.302-4.337 4.173-2.945 7.446-7.118 9.573-12.519 2.21-5.482 3.274-12.027 3.274-19.637 0-7.609-1.064-14.155-3.274-19.8-2.127-5.646-5.318-10.064-9.491-13.255-4.174-3.11-9.329-4.746-15.384-4.746s-11.537 1.636-15.792 4.91c-4.173 3.272-7.365 7.772-9.492 13.418-2.128 5.727-3.191 12.191-3.191 19.392 0 7.2 1.063 13.745 3.273 19.228 2.127 5.482 5.318 9.736 9.573 12.764 4.174 3.027 9.41 4.582 15.629 4.582Zm141.56-26.51V71.839h28.23v119.786h-27.412v-21.273h-1.227c-2.7 6.709-7.119 12.191-13.338 16.446-6.137 4.255-13.747 6.382-22.748 6.382-7.855 0-14.81-1.718-20.783-5.237-5.974-3.518-10.72-8.591-14.075-15.382-3.355-6.709-5.073-14.891-5.073-24.464V71.839h28.312v71.921c0 7.609 2.046 13.664 6.219 18.083 4.173 4.5 9.655 6.709 16.365 6.709 4.173 0 8.183-.982 12.111-3.028 3.927-2.045 7.118-5.072 9.655-9.082 2.537-4.091 3.764-9.164 3.764-15.218Zm65.707-109.395v159.796h-28.23V31.828h28.23Zm44.841 162.169c-7.61 0-14.402-1.391-20.457-4.091-6.055-2.7-10.883-6.791-14.32-12.109-3.518-5.319-5.237-11.946-5.237-19.801 0-6.791 1.228-12.355 3.765-16.773 2.536-4.419 5.891-7.937 10.228-10.637 4.337-2.618 9.164-4.664 14.647-6.055 5.4-1.391 11.046-2.373 16.856-3.027 7.037-.737 12.683-1.391 17.102-1.964 4.337-.573 7.528-1.555 9.574-2.782 1.963-1.309 3.027-3.273 3.027-5.973v-.491c0-5.891-1.718-10.391-5.237-13.664-3.518-3.191-8.51-4.828-15.056-4.828-6.955 0-12.356 1.473-16.447 4.5-4.009 3.028-6.71 6.546-8.183 10.719l-26.348-3.764c2.046-7.282 5.483-13.336 10.31-18.328 4.746-4.909 10.638-8.59 17.511-11.045 6.955-2.455 14.565-3.682 22.912-3.682 5.809 0 11.537.654 17.265 2.045s10.965 3.6 15.711 6.71c4.746 3.109 8.51 7.282 11.455 12.6 2.864 5.318 4.337 11.946 4.337 19.883v80.184h-27.166v-16.446h-.9c-1.719 3.355-4.092 6.464-7.201 9.328-3.109 2.864-6.955 5.237-11.619 6.955-4.828 1.718-10.229 2.536-16.529 2.536Zm7.364-20.701c5.646 0 10.556-1.145 14.729-3.354 4.173-2.291 7.364-5.237 9.655-9.001 2.292-3.763 3.355-7.854 3.355-12.273v-14.155c-.9.737-2.373 1.391-4.5 2.046-2.128.654-4.419 1.145-7.037 1.636-2.619.491-5.155.9-7.692 1.227-2.537.328-4.746.655-6.628.901-4.173.572-8.019 1.472-11.292 2.781-3.355 1.31-5.973 3.11-7.855 5.401-1.964 2.291-2.864 5.318-2.864 8.918 0 5.237 1.882 9.164 5.728 11.782 3.682 2.782 8.51 4.091 14.401 4.091Zm64.643 18.328V71.839h27.412v19.965h1.227c2.21-6.955 5.974-12.274 11.292-16.038 5.319-3.763 11.456-5.645 18.329-5.645 1.555 0 3.355.082 5.237.163 1.964.164 3.601.328 4.91.573v25.938c-1.227-.41-3.109-.819-5.646-1.146a58.814 58.814 0 0 0-7.446-.49c-5.155 0-9.738 1.145-13.829 3.354-4.091 2.209-7.282 5.236-9.655 9.164-2.373 3.927-3.519 8.427-3.519 13.5v70.448h-28.312ZM222.077 39.192l-8.019 125.923L137.387 0l84.69 39.192Zm-53.105 162.825-57.933 33.056-57.934-33.056 11.783-28.556h92.301l11.783 28.556ZM111.039 62.675l30.357 73.803H80.681l30.358-73.803ZM7.937 165.115 0 39.192 84.69 0 7.937 165.115Z"
-          />
-        </g>
-        <defs>
-          <radialGradient
-            id="c"
-            cx="0"
-            cy="0"
-            r="1"
-            gradientTransform="rotate(118.122 171.182 60.81) scale(205.794)"
-            gradientUnits="userSpaceOnUse"
-          >
-            <stop stop-color="#FF41F8" />
-            <stop offset=".707" stop-color="#FF41F8" stop-opacity=".5" />
-            <stop offset="1" stop-color="#FF41F8" stop-opacity="0" />
-          </radialGradient>
-          <linearGradient
-            id="b"
-            x1="0"
-            x2="982"
-            y1="192"
-            y2="192"
-            gradientUnits="userSpaceOnUse"
-          >
-            <stop stop-color="#F0060B" />
-            <stop offset="0" stop-color="#F0070C" />
-            <stop offset=".526" stop-color="#CC26D5" />
-            <stop offset="1" stop-color="#7702FF" />
-          </linearGradient>
-          <clipPath id="a"><path fill="#fff" d="M0 0h982v239H0z" /></clipPath>
-        </defs>
-      </svg>
-      <h1>Hello, {{ title() }}</h1>
-      <p>Congratulations! Your app is running. 🎉</p>
+  <!-- TOAST FLOTANTE GLOBAL MINIMALISTA -->
+  @if (toastMensaje(); as msg) {
+    <div class="floating-toast-alert animate-fade-in">
+      <span class="toast-dot"></span>
+      <span class="toast-text">{{ msg }}</span>
+      <button class="toast-close" (click)="toastMensaje.set(null)">✕</button>
     </div>
-    <div class="divider" role="separator" aria-label="Divider"></div>
-    <div class="right-side">
-      <div class="pill-group">
-        @for (item of [
-          { title: 'Explore the Docs', link: 'https://angular.dev' },
-          { title: 'Learn with Tutorials', link: 'https://angular.dev/tutorials' },
-          { title: 'Prompt and best practices for AI', link: 'https://angular.dev/ai/develop-with-ai'},
-          { title: 'CLI Docs', link: 'https://angular.dev/tools/cli' },
-          { title: 'Angular Language Service', link: 'https://angular.dev/tools/language-service' },
-          { title: 'Angular DevTools', link: 'https://angular.dev/tools/devtools' },
-        ]; track item.title) {
-          <a
-            class="pill"
-            [href]="item.link"
-            target="_blank"
-            rel="noopener"
-          >
-            <span>{{ item.title }}</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              height="14"
-              viewBox="0 -960 960 960"
-              width="14"
-              fill="currentColor"
-            >
-              <path
-                d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h560v-280h80v280q0 33-23.5 56.5T760-120H200Zm188-212-56-56 372-372H560v-80h280v280h-80v-144L388-332Z"
-              />
+  }
+
+  <!-- VISTA 1: MENÚ COMERCIAL PRINCIPAL -->
+  @if (tabActiva() === 'menu') {
+    <div class="animate-fade-in">
+      <!-- BARRA DE SEGUIMIENTO EN VIVO (Condicionada: SOLO sesión activa Y con pedido) -->
+      @if (authService.sesionActiva() && obtenerUltimoPedido(); as ultimo) {
+        <section class="live-tracker-bar animate-fade-in">
+          <div class="tracker-container">
+            <div class="tracker-header">
+              <div class="tracker-title-box">
+                <span class="pulse-dot"></span>
+                <strong>Seguimiento de tu Orden #{{ ultimo.id }}</strong>
+                <span class="tracker-flavor">({{ ultimo.saborPizza }})</span>
+              </div>
+              <div class="tracker-estimate-box">
+                @if (pedidoService.etapaSeguimiento() === 4) {
+                  <span class="delivery-time-estimate completed">🎉 ¡Orden Entregada con Éxito! Que disfrutes tu pizza</span>
+                } @else {
+                  <span class="delivery-time-estimate">⏱️ Tiempo estimado de llegada: ~{{ pedidoService.minutosEstimados() }} min</span>
+                }
+              </div>
+            </div>
+
+            <!-- Barra de progreso visual continua -->
+            <div class="tracker-progress-track">
+              <div class="tracker-progress-fill" [style.width.%]="(pedidoService.etapaSeguimiento() / 4) * 100"></div>
+            </div>
+
+            <div class="tracker-steps">
+              <div class="t-step" [class.active]="pedidoService.etapaSeguimiento() >= 0" [class.current]="pedidoService.etapaSeguimiento() === 0">
+                <div class="t-circle">{{ pedidoService.etapaSeguimiento() > 0 ? '✓' : '📝' }}</div>
+                <span>1. Recibido</span>
+              </div>
+              <div class="t-line" [class.active]="pedidoService.etapaSeguimiento() >= 1"></div>
+              <div class="t-step" [class.active]="pedidoService.etapaSeguimiento() >= 1" [class.current]="pedidoService.etapaSeguimiento() === 1">
+                <div class="t-circle">{{ pedidoService.etapaSeguimiento() > 1 ? '✓' : '👨‍🍳' }}</div>
+                <span>2. Amasando</span>
+              </div>
+              <div class="t-line" [class.active]="pedidoService.etapaSeguimiento() >= 2"></div>
+              <div class="t-step" [class.active]="pedidoService.etapaSeguimiento() >= 2" [class.current]="pedidoService.etapaSeguimiento() === 2">
+                <div class="t-circle">{{ pedidoService.etapaSeguimiento() > 2 ? '✓' : '🔥' }}</div>
+                <span>3. Al Horno</span>
+              </div>
+              <div class="t-line" [class.active]="pedidoService.etapaSeguimiento() >= 3"></div>
+              <div class="t-step" [class.active]="pedidoService.etapaSeguimiento() >= 3" [class.current]="pedidoService.etapaSeguimiento() === 3">
+                <div class="t-circle">{{ pedidoService.etapaSeguimiento() > 3 ? '✓' : '🛵' }}</div>
+                <span>4. En Reparto</span>
+              </div>
+              <div class="t-line" [class.active]="pedidoService.etapaSeguimiento() >= 4"></div>
+              <div class="t-step" [class.active]="pedidoService.etapaSeguimiento() >= 4" [class.current]="pedidoService.etapaSeguimiento() === 4">
+                <div class="t-circle">🎉</div>
+                <span>5. ¡Entregado!</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      }
+
+      <!-- ESCENARIO SCROLLYTELLING INTEGRADO (HERO + ATELIER D'AUTORE) -->
+      <section class="scrolly-master-wrapper" id="catalogo-menu">
+        <div class="hero-apple-ambient-glow"></div>
+
+        <div class="scrolly-container">
+          <!-- HERO INTRO: Cabecera centrada de alto impacto que se desvanece con suavidad al scrollear -->
+          <div class="hero-intro-header" [style.opacity]="heroOpacity()" [style.transform]="heroTransform()" [style.pointer-events]="scrollProgress() > 0.4 ? 'none' : 'auto'">
+            <div class="apple-pill-badge animate-pulse-glow">
+              <span class="flame-icon">🔥</span>
+              <span>ATELIER D'AUTORE • FORNO A LEGNA 400°C</span>
+            </div>
+
+            <h1 class="hero-apple-title">
+              La Verdadera Pizza Artesanal.<br>
+              <span class="apple-gradient-text">Horneada al Fuego de Verdad.</span>
+            </h1>
+
+            <p class="hero-apple-subtitle">
+              Masa madre viva de 48 horas, tomates San Marzano DOP madurados al sol y mozzarella fior di latte fresco.
+              Pide en línea y recibe confirmación automática al instante en tu correo.
+            </p>
+
+            <div class="hero-apple-actions">
+              <button class="btn-apple-primary btn-shimmer" (click)="scrollAlMenu()">
+                <span>Ver Carta d'Autore</span>
+                <span class="btn-arrow">›</span>
+              </button>
+              <button class="btn-apple-secondary" (click)="abrirModalPedido()">
+                <span>Personalizar Pedido</span>
+                <span class="btn-arrow">›</span>
+              </button>
+              <button class="btn-apple-outline" (click)="cambiarTab('tech_docs')" title="Explorar la Arquitectura Hexagonal y Spring Boot">
+                <span>🛠️ Cómo Funciona</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- STAGE DE TRANSFORMACIÓN CONTINUA: LA PIZZA EN VIVO QUE VIAJA DEL CENTRO AL COSTADO -->
+          <div class="scrolly-dual-stage">
+            
+            <!-- COLUMNA / STAGE DE LA PIZZA VIVA (STICKY) -->
+            <aside class="scrolly-sticky-pizza-col">
+              <div class="pizza-transform-actor" [style.transform]="pizzaTransformStyle()">
+                <!-- Anillos Concéntricos de Luz -->
+                <div class="orbit-halo halo-outer"></div>
+                <div class="orbit-halo halo-middle"></div>
+                <div class="orbit-halo halo-inner"></div>
+                <div class="product-radial-light"></div>
+
+                <!-- Badges Flotantes de la Pizza (en fase Hero) -->
+                <div class="floating-orbit-pill pill-top-left" [style.opacity]="heroOpacity()">
+                  <span>🌾 Masa Madre 48h</span>
+                </div>
+                <div class="floating-orbit-pill pill-top-right" [style.opacity]="heroOpacity()">
+                  <span>🧀 Fior di Latte DOP</span>
+                </div>
+                <div class="floating-orbit-pill pill-bottom-left" [style.opacity]="heroOpacity()">
+                  <span>🍅 San Marzano DOP</span>
+                </div>
+                <div class="floating-orbit-pill pill-bottom-right" [style.opacity]="heroOpacity()">
+                  <span>🔥 Forno a 400°C</span>
+                </div>
+
+                <!-- El Disco de la Pizza Central que se Transforma y Rota -->
+                <div class="pizza-hero-disc hover-lift" (click)="abrirDetallePizza(pizzaEnShowcase())">
+                  <img 
+                    [src]="pizzaEnShowcase().fotoUrl" 
+                    [alt]="pizzaEnShowcase().nombre" 
+                    class="pizza-hero-photo"
+                    [style.transform]="'rotate(' + rotacionShowcase() + 'deg)'" />
+                  
+                  <div class="hero-disc-glass-ribbon" [style.opacity]="heroOpacity()" [style.pointer-events]="scrollProgress() > 0.35 ? 'none' : 'auto'">
+                    <span class="ribbon-title">{{ pizzaEnShowcase().nombre }}</span>
+                    <span class="ribbon-price">\${{ pizzaEnShowcase().precio | number:'1.2-2' }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Ficha de Detalles en Vitrina (Sommelier, ingredientes y botones de acción rápida) -->
+              <div class="showcase-info-card glass-card" [style.opacity]="infoCardOpacity()" [style.transform]="infoCardTransform()" [style.pointer-events]="scrollProgress() > 0.55 ? 'auto' : 'none'">
+                <div class="info-top-row">
+                  <div>
+                    <span class="info-eyebrow">PIZZA EN VITRINA</span>
+                    <h3 class="info-pizza-name">{{ pizzaEnShowcase().nombre }}</h3>
+                    @if (pizzaEnShowcase().subtituloItaliano) {
+                      <span class="info-pizza-sub">{{ pizzaEnShowcase().subtituloItaliano }}</span>
+                    }
+                  </div>
+                  <div class="info-price-pill">
+                    <span class="currency">$</span>
+                    <span class="val">{{ pizzaEnShowcase().precio | number:'1.2-2' }}</span>
+                  </div>
+                </div>
+
+                <p class="info-desc">{{ pizzaEnShowcase().descripcion }}</p>
+
+                @if (pizzaEnShowcase().maridajeRecomendado) {
+                  <div class="info-sommelier-box">
+                    <span class="wine-icon">🍷</span>
+                    <div>
+                      <strong class="wine-title">Maridaje Sommelier:</strong>
+                      <span class="wine-name">{{ pizzaEnShowcase().maridajeRecomendado }}</span>
+                    </div>
+                  </div>
+                }
+
+                <div class="info-ingredients-strip">
+                  <span class="ing-label">Ingredientes:</span>
+                  <div class="ing-pill-list">
+                    @for (ing of pizzaEnShowcase().ingredientes; track ing) {
+                      <span class="ing-chip">{{ ing }}</span>
+                    }
+                  </div>
+                </div>
+
+                <div class="info-actions-row">
+                  <button 
+                    type="button" 
+                    class="btn-showcase-custom"
+                    (click)="abrirDetallePizza(pizzaEnShowcase())">
+                    <span>Personalizar</span>
+                  </button>
+                  <button 
+                    type="button" 
+                    class="btn-showcase-order btn-shimmer"
+                    (click)="alSeleccionarPizza(pizzaEnShowcase())">
+                    <span>Pedir Ahora</span>
+                    <span class="btn-arrow">→</span>
+                  </button>
+                </div>
+              </div>
+            </aside>
+
+            <!-- COLUMNA DERECHA: VARIEDADES DE PIZZA (DESLIZADAS AL HACER SCROLL) -->
+            <section class="scrolly-catalog-col" [style.opacity]="catalogOpacity()" [style.transform]="catalogTransform()">
+              <div class="catalog-col-header">
+                <span class="badge-sub">Atelier d'Autore • Forno a Legna 400°C</span>
+                <h2 class="showcase-main-title">Pizze Artigianali a Lunga Lievitazione</h2>
+                <p class="showcase-lead">
+                  Selecciona o desplázate para apreciar cada pizza en gran formato con su maridaje sugerido.
+                </p>
+
+                <!-- Filtros de Categoría -->
+                <div class="showcase-filter-bar">
+                  <button 
+                    type="button"
+                    class="filter-pill" 
+                    [class.active]="filtroShowcase() === 'todas'"
+                    (click)="filtroShowcase.set('todas')">
+                    <span>Tutte le Pizze ({{ pedidoService.catalogoPizzas.length }})</span>
+                  </button>
+                  <button 
+                    type="button"
+                    class="filter-pill" 
+                    [class.active]="filtroShowcase() === 'populares'"
+                    (click)="filtroShowcase.set('populares')">
+                    <span>⭐ Popolari</span>
+                  </button>
+                  <button 
+                    type="button"
+                    class="filter-pill" 
+                    [class.active]="filtroShowcase() === 'veggie'"
+                    (click)="filtroShowcase.set('veggie')">
+                    <span>🌱 Vegetariane</span>
+                  </button>
+                  <button 
+                    type="button"
+                    class="filter-pill" 
+                    [class.active]="filtroShowcase() === 'picante'"
+                    (click)="filtroShowcase.set('picante')">
+                    <span>🌶️ Piccanti</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Lista de Variedades -->
+              <div class="pizza-types-list">
+                @for (pizza of pizzasShowcaseFiltradas(); track pizza.id) {
+                  <article 
+                    class="pizza-variety-card glass-card hover-lift"
+                    [class.selected-variety]="pizzaEnShowcase().id === pizza.id"
+                    (click)="seleccionarPizzaShowcase(pizza)">
+                    
+                    <div class="variety-photo-frame">
+                      <img [src]="pizza.fotoUrl" [alt]="pizza.nombre" class="variety-img" />
+                      <div class="variety-overlay"></div>
+                      <span class="variety-price">\${{ pizza.precio | number:'1.2-2' }}</span>
+                      @if (pizza.popular) {
+                        <span class="variety-badge-pop">POPULAR</span>
+                      }
+                    </div>
+
+                    <div class="variety-content">
+                      <div class="variety-header">
+                        <div>
+                          <h4 class="variety-title">{{ pizza.nombre }}</h4>
+                          @if (pizza.subtituloItaliano) {
+                            <span class="variety-sub">{{ pizza.subtituloItaliano }}</span>
+                          }
+                        </div>
+                        <div class="variety-tags">
+                          @if (pizza.vegetariana) {
+                            <span class="v-tag tag-veggie">🌱 Veggie</span>
+                          }
+                          @if (pizza.picante) {
+                            <span class="v-tag tag-spicy">🌶️ Piccante</span>
+                          }
+                        </div>
+                      </div>
+
+                      <p class="variety-desc">{{ pizza.descripcion }}</p>
+
+                      <div class="variety-ingredients">
+                        @for (ing of pizza.ingredientes; track ing) {
+                          <span class="v-ing">{{ ing }}</span>
+                        }
+                      </div>
+
+                      <div class="variety-footer">
+                        <button 
+                          type="button" 
+                          class="btn-variety-view" 
+                          [class.active-view]="pizzaEnShowcase().id === pizza.id"
+                          (click)="$event.stopPropagation(); seleccionarPizzaShowcase(pizza)">
+                          <span>{{ pizzaEnShowcase().id === pizza.id ? '👁️ Viendo en Vitrina' : 'Ver en Vitrina' }}</span>
+                        </button>
+                        
+                        <button 
+                          type="button" 
+                          class="btn-variety-buy btn-shimmer"
+                          (click)="$event.stopPropagation(); alSeleccionarPizza(pizza)">
+                          <span>Pedir \${{ pizza.precio | number:'1.2-2' }}</span>
+                          <span class="btn-arrow">→</span>
+                        </button>
+                      </div>
+                    </div>
+
+                  </article>
+                }
+              </div>
+            </section>
+
+          </div>
+
+          <!-- Barra de 4 Pilares de Excelencia (Visible en Hero) -->
+          <div class="hero-quality-bar-wrapper" [style.opacity]="heroOpacity()">
+            <div class="apple-quality-bar">
+              <div class="quality-card hover-lift">
+                <span class="q-icon-orb">
+                  <svg class="q-svg" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 22s5-4 8-10c-3-2-6 1-8 10zM12 2s4 5 10 8c2-3-1-6-10-8zM12 12l8 8M9 9l4 4"/>
+                  </svg>
+                </span>
+                <div class="q-meta">
+                  <strong>Masa Madre 48h</strong>
+                  <span>Fermentación lenta natural</span>
+                </div>
+              </div>
+              <div class="quality-card hover-lift">
+                <span class="q-icon-orb">
+                  <svg class="q-svg" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2l8 4v6c0 5.5-3.5 10-8 12-4.5-2-8-6.5-8-12V6l8-4z"/>
+                    <circle cx="12" cy="12" r="3" fill="#ffffff"/>
+                  </svg>
+                </span>
+                <div class="q-meta">
+                  <strong>Fior di Latte DOP</strong>
+                  <span>Queso artesanal fresco</span>
+                </div>
+              </div>
+              <div class="quality-card hover-lift">
+                <span class="q-icon-orb">
+                  <svg class="q-svg" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="#dc2626" fill-opacity="0.3"/>
+                  </svg>
+                </span>
+                <div class="q-meta">
+                  <strong>Entrega en 30 min</strong>
+                  <span>Garantía térmica express</span>
+                </div>
+              </div>
+              <div class="quality-card hover-lift">
+                <span class="q-icon-orb">
+                  <svg class="q-svg" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="4" width="20" height="16" rx="2"/>
+                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                    <circle cx="18" cy="15" r="2" fill="#ef4444"/>
+                  </svg>
+                </span>
+                <div class="q-meta">
+                  <strong>Aviso Brevo API v3</strong>
+                  <span>Confirmación inmediata</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN DE COMBOS & PROMOCIONES RÁPIDAS -->
+      <section class="deals-section">
+        <div class="section-container">
+          <div class="section-header-centered">
+            <span class="badge-sub">Selezione Speciale</span>
+            <h2 class="section-main-title">Combos & Experiencias para Compartir</h2>
+            <p class="section-lead">Combinaciones pensadas para disfrutar en pareja, amigos o toda la familia.</p>
+          </div>
+
+          <div class="deals-grid">
+            <!-- Combo 1 -->
+            <div class="deal-card hover-lift">
+              <div class="deal-badge-pop">MÁS POPULAR</div>
+              <div class="deal-icon-orb">
+                <svg class="deal-svg-icon" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+              </div>
+              <h3 class="deal-title">Combo Pareja Byte</h3>
+              <p class="deal-items">1 Pizza Mediana a elección + 2 Bebidas Artesanales + 1 Postre Brownie Byte</p>
+              <div class="deal-pricing">
+                <span class="deal-old">$25.99</span>
+                <span class="deal-price">$19.99</span>
+                <span class="save-tag">Ahorras $6</span>
+              </div>
+              <button class="btn-deal-order btn-shimmer" (click)="seleccionarCombo('Combo Pareja Byte', 19.99, 'Pepperoni')">
+                Añadir Combo a la Orden
+              </button>
+            </div>
+
+            <!-- Combo 2 -->
+            <div class="deal-card hot-deal hover-lift">
+              <div class="deal-badge-hot">MEGA AHORRO</div>
+              <div class="deal-icon-orb">
+                <svg class="deal-svg-icon" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+                  <path d="M2 12h20"/>
+                </svg>
+              </div>
+              <h3 class="deal-title">Mega Byte Familiar</h3>
+              <p class="deal-items">1 Pizza Familiar + 1 Pizza Mediana + Palitos de Ajo con Queso y Parmesano</p>
+              <div class="deal-pricing">
+                <span class="deal-old">$44.00</span>
+                <span class="deal-price">$32.99</span>
+                <span class="save-tag">Ahorras $11</span>
+              </div>
+              <button class="btn-deal-order btn-shimmer" (click)="seleccionarCombo('Mega Byte Familiar', 32.99, 'Cuatro Quesos')">
+                Añadir Combo a la Orden
+              </button>
+            </div>
+
+            <!-- Combo 3 -->
+            <div class="deal-card hover-lift">
+              <div class="deal-badge-pop">FIESTA TOTAL</div>
+              <div class="deal-icon-orb">
+                <svg class="deal-svg-icon" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#dc2626" fill-opacity="0.3"/>
+                </svg>
+              </div>
+              <h3 class="deal-title">Byte Party con Amigos</h3>
+              <p class="deal-items">2 Pizzas Familiares + 4 Refrescos + Salsa Especial de la Casa + Postre</p>
+              <div class="deal-pricing">
+                <span class="deal-old">$56.99</span>
+                <span class="deal-price">$41.99</span>
+                <span class="save-tag">Ahorras $15</span>
+              </div>
+              <button class="btn-deal-order btn-shimmer" (click)="seleccionarCombo('Byte Party con Amigos', 41.99, 'BBQ')">
+                Añadir Combo a la Orden
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN: POR QUÉ ELEGIR PIZZABYTE -->
+      <section class="why-us-section">
+        <div class="section-container">
+          <div class="section-header-centered">
+            <span class="badge-sub">Filosofía Artesanal</span>
+            <h2 class="section-main-title">¿Por Qué Elegir PizzaByte?</h2>
+            <p class="section-lead">La autenticidad de la tradición pizzera italiana unida a la precisión tecnológica.</p>
+          </div>
+
+          <div class="features-grid">
+            <div class="feat-card hover-lift">
+              <div class="feat-icon-orb">
+                <svg class="feat-svg-icon" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                  <line x1="3" y1="6" x2="21" y2="6"/>
+                  <path d="M16 10a4 4 0 0 1-8 0"/>
+                </svg>
+              </div>
+              <h4>Harinas Italianas & Masa Madre</h4>
+              <p>Fermentamos cada bola de masa durante dos días completos. El resultado es un borde aireado, crujiente y de fácil digestión.</p>
+            </div>
+
+            <div class="feat-card hover-lift">
+              <div class="feat-icon-orb">
+                <svg class="feat-svg-icon" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="14" r="8" fill="#dc2626" fill-opacity="0.25"/>
+                  <path d="M12 2v4M9 4c1 1 3 2 6 0"/>
+                </svg>
+              </div>
+              <h4>Tomates San Marzano DOP</h4>
+              <p>Nuestra salsa de tomate no lleva conservantes ni azúcar añadida; solo tomates madurados al sol y albahaca fresca de huerto.</p>
+            </div>
+
+            <div class="feat-card hover-lift">
+              <div class="feat-icon-orb">
+                <svg class="feat-svg-icon" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" fill="#dc2626" fill-opacity="0.3"/>
+                </svg>
+              </div>
+              <h4>Horno de Piedra a 400°C</h4>
+              <p>La cocción ultra rápida a alta temperatura carameliza el queso y crea esos leopard spots característicos de la vera pizza napolitana.</p>
+            </div>
+
+            <div class="feat-card hover-lift">
+              <div class="feat-icon-orb">
+                <svg class="feat-svg-icon" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                  <line x1="12" y1="18" x2="12.01" y2="18"/>
+                  <line x1="9" y1="6" x2="15" y2="6"/>
+                </svg>
+              </div>
+              <h4>Despacho & Notificación Instantánea</h4>
+              <p>Tu orden se procesa de inmediato en nuestro backend y recibes una confirmación formal en tu bandeja de correo al segundo.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TESTIMONIOS DE CLIENTES -->
+      <section class="reviews-section">
+        <div class="section-container">
+          <div class="section-header-centered">
+            <span class="badge-sub">La Voce dei Clienti</span>
+            <h2 class="section-main-title">4.9 de 5 Estrellas en Más de 1,200 Reseñas</h2>
+            <p class="section-lead">Comensales reales que disfrutan del auténtico sabor de PizzaByte día con día.</p>
+          </div>
+
+          <div class="reviews-grid">
+            <div class="review-card hover-lift">
+              <div class="stars">★★★★★</div>
+              <p class="review-text">"La masa madre hace toda la diferencia del mundo. El borde queda crujiente por fuera y suave por dentro. Y lo mejor es que el correo de confirmación me llegó al instante."</p>
+              <div class="reviewer">
+                <span class="r-avatar">👨‍💻</span>
+                <div>
+                  <strong>Alejandro R.</strong>
+                  <span>Cliente Frecuente</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="review-card hover-lift">
+              <div class="stars">★★★★★</div>
+              <p class="review-text">"Pedí la Pepperoni Clásica Byte y el Cuatro Quesos. El sabor es de auténtica pizzería artesanal, nada que ver con las cadenas comerciales. 100% recomendada."</p>
+              <div class="reviewer">
+                <span class="r-avatar">👩‍🔬</span>
+                <div>
+                  <strong>Mariana S.</strong>
+                  <span>Cliente VIP</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="review-card hover-lift">
+              <div class="stars">★★★★★</div>
+              <p class="review-text">"Puntualidad impecable. Llegó caliente en menos de 28 minutos y con el queso perfectamente fundido. La salsa BBQ Stack tiene un toque ahumado delicioso."</p>
+              <div class="reviewer">
+                <span class="r-avatar">👨‍🎨</span>
+                <div>
+                  <strong>David L.</strong>
+                  <span>Cliente Verificado</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  }
+
+  <!-- VISTA 2: PROMOCIONES DEDICADAS -->
+  @if (tabActiva() === 'promociones') {
+    <div class="animate-fade-in section-container page-padding">
+      <div class="section-header-centered">
+        <span class="badge-sub">✦ CLUB DE BENEFICIOS & ALTA COCINA ✦</span>
+        <h1 class="section-main-title">Promociones & Cupones Exclusivos</h1>
+        <p class="section-lead">Aprovecha nuestras promociones activas para hoy. Haz clic en cualquier cupón para aplicarlo directamente en tu pedido.</p>
+      </div>
+
+      <div class="promos-page-grid">
+        <!-- Cupón 1: Martes 2x1 -->
+        <div class="voucher-card hot-voucher hover-lift" (click)="abrirModalCupon('MARTES2X1', 'Martes de 2x1 en Pepperoni', 'Compra una Pizza Familiar de Pepperoni y la segunda es cortesía de la casa.', '100% en 2da Pizza')">
+          <div class="voucher-accent-bar"></div>
+          <div class="voucher-header">
+            <span class="voucher-tag hot">✦ MARTES 2X1</span>
+            <span class="voucher-expiry">Válido Hoy</span>
+          </div>
+
+          <div class="voucher-body">
+            <div class="voucher-icon-orb">
+              <!-- SVG 2x1 Pizza Slices with steam -->
+              <svg class="v-svg" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 34L8 14C11 10.5 29 10.5 32 14L20 34Z" fill="#dc2626" stroke="#ffffff" stroke-width="1.5"/>
+                <path d="M7 14C11 9.5 29 9.5 33 14" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="20" cy="18" r="2.5" fill="#ffffff"/>
+                <circle cx="15" cy="24" r="2" fill="#ffffff"/>
+                <circle cx="24" cy="24" r="2" fill="#ffffff"/>
+                <!-- Badge 2x1 -->
+                <rect x="23" y="4" width="16" height="11" rx="4" fill="#ffffff"/>
+                <text x="31" y="12" font-size="7" font-weight="900" fill="#dc2626" text-anchor="middle" font-family="'JetBrains Mono', sans-serif">2x1</text>
+              </svg>
+            </div>
+
+            <h3 class="voucher-title">2x1 en Pepperoni Clásica Byte</h3>
+            <p class="voucher-desc">Compra una Pizza Familiar de Pepperoni y te llevas la segunda completamente gratis.</p>
+
+            <div class="voucher-pricing">
+              <span class="voucher-price">$16.99</span>
+              <span class="save-tag">Ahorras $16.99 (100% en 2da)</span>
+            </div>
+          </div>
+
+          <!-- Perforated ticket divider with notches -->
+          <div class="ticket-perforated">
+            <div class="notch notch-left"></div>
+            <div class="dashed-line"></div>
+            <div class="notch notch-right"></div>
+          </div>
+
+          <div class="voucher-footer">
+            <div class="voucher-code-pill">
+              <span class="code-label">CÓDIGO:</span>
+              <span class="code-text">MARTES2X1</span>
+            </div>
+            <button class="btn-voucher-cta btn-shimmer">
+              <span>Ver Cupón & Aplicar</span>
+              <span class="btn-arrow">→</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Cupón 2: BYTE20 -->
+        <div class="voucher-card hover-lift" (click)="abrirModalCupon('BYTE20', '20% OFF en Primera Orden', 'Aplica un 20% de descuento directo en tu carrito al registrarte.', '20% OFF')">
+          <div class="voucher-accent-bar"></div>
+          <div class="voucher-header">
+            <span class="voucher-tag special">✦ PRIMERA ORDEN</span>
+            <span class="voucher-expiry">Nuevo Cliente</span>
+          </div>
+
+          <div class="voucher-body">
+            <div class="voucher-icon-orb">
+              <!-- SVG Coupon Ticket with % -->
+              <svg class="v-svg" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="6" y="10" width="28" height="20" rx="4" fill="#121212" stroke="#dc2626" stroke-width="1.8"/>
+                <path d="M14 10V30" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="2 2"/>
+                <circle cx="6" cy="20" r="3" fill="#000000"/>
+                <circle cx="34" cy="20" r="3" fill="#000000"/>
+                <text x="24" y="24" font-size="12" font-weight="900" fill="#ffffff" text-anchor="middle" font-family="'JetBrains Mono', sans-serif">20%</text>
+              </svg>
+            </div>
+
+            <h3 class="voucher-title">20% OFF en Primera Orden</h3>
+            <p class="voucher-desc">Válido en cualquier pizza o combo de nuestro catálogo registrando tu cuenta de cliente.</p>
+
+            <div class="voucher-pricing">
+              <span class="voucher-price">20% de Ahorro</span>
+              <span class="save-tag">En todo el menú</span>
+            </div>
+          </div>
+
+          <!-- Perforated ticket divider with notches -->
+          <div class="ticket-perforated">
+            <div class="notch notch-left"></div>
+            <div class="dashed-line"></div>
+            <div class="notch notch-right"></div>
+          </div>
+
+          <div class="voucher-footer">
+            <div class="voucher-code-pill">
+              <span class="code-label">CÓDIGO:</span>
+              <span class="code-text">BYTE20</span>
+            </div>
+            <button class="btn-voucher-cta btn-shimmer">
+              <span>Ver Cupón & Aplicar</span>
+              <span class="btn-arrow">→</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Cupón 3: Brownie Byte -->
+        <div class="voucher-card hover-lift" (click)="abrirModalCupon('POSTREBYTE', 'Postre Brownie Byte Gratis', 'En órdenes de $30 o más, disfruta de nuestro brownie horneado.', 'Postre Gratis')">
+          <div class="voucher-accent-bar"></div>
+          <div class="voucher-header">
+            <span class="voucher-tag vip">✦ CORTESÍA VIP</span>
+            <span class="voucher-expiry">Órdenes $30+</span>
+          </div>
+
+          <div class="voucher-body">
+            <div class="voucher-icon-orb">
+              <!-- SVG Dessert Cloche / Gift Box -->
+              <svg class="v-svg" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 26C8 18 14 12 20 12C26 12 32 18 32 26H8Z" fill="#dc2626" fill-opacity="0.25" stroke="#dc2626" stroke-width="1.8"/>
+                <path d="M5 28H35" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="20" cy="9" r="2.5" fill="#ffffff"/>
+                <path d="M20 12V9" stroke="#ffffff" stroke-width="1.5"/>
+                <path d="M12 8L14 11M28 8L26 11" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+
+            <h3 class="voucher-title">Brownie Byte de Regalo</h3>
+            <p class="voucher-desc">En todas las órdenes superiores a $30.00, postre artesanal horneado cortesía de la casa.</p>
+
+            <div class="voucher-pricing">
+              <span class="voucher-price">Gratis ($0.00)</span>
+              <span class="save-tag">Valor $6.50</span>
+            </div>
+          </div>
+
+          <!-- Perforated ticket divider with notches -->
+          <div class="ticket-perforated">
+            <div class="notch notch-left"></div>
+            <div class="dashed-line"></div>
+            <div class="notch notch-right"></div>
+          </div>
+
+          <div class="voucher-footer">
+            <div class="voucher-code-pill">
+              <span class="code-label">CÓDIGO:</span>
+              <span class="code-text">POSTREBYTE</span>
+            </div>
+            <button class="btn-voucher-cta btn-shimmer">
+              <span>Ver Cupón & Aplicar</span>
+              <span class="btn-arrow">→</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra de Reaseguro / Beneficios -->
+      <div class="promo-reassurance-bar">
+        <div class="reassurance-item">
+          <svg class="reassure-icon" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>Garantía de sabor & masa madre 48h</span>
+        </div>
+        <div class="reassurance-sep">•</div>
+        <div class="reassurance-item">
+          <svg class="reassure-icon" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>Despacho express a domicilio en &lt; 30 min</span>
+        </div>
+        <div class="reassurance-sep">•</div>
+        <div class="reassurance-item">
+          <svg class="reassure-icon" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          <span>Notificación instantánea vía Brevo API</span>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- VISTA 3: COBERTURA Y DELIVERY -->
+  @if (tabActiva() === 'delivery') {
+    <div class="animate-fade-in section-container page-padding">
+      <div class="section-header-centered">
+        <span class="badge-sub">✦ LOGÍSTICA & FLOTA TÉRMICA ✦</span>
+        <h1 class="section-main-title">Delivery Express PizzaByte</h1>
+        <p class="section-lead">Llevamos tu pizza crujiente y humeante directo a tu puerta en menos de 30 minutos con aislamiento térmico multicapa.</p>
+      </div>
+
+      <div class="delivery-info-grid">
+        <!-- Card 1: 30 min -->
+        <div class="del-card hover-lift">
+          <div class="del-pill-tag">
+            <span class="pill-dot"></span>
+            <span>GARANTÍA TÉRMICA</span>
+          </div>
+
+          <div class="del-icon-orb">
+            <!-- Modern Delivery Courier Scooter with speed trails SVG -->
+            <svg class="del-svg" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="14" cy="36" r="6" stroke="#ef4444" stroke-width="2.5" fill="#000000"/>
+              <circle cx="36" cy="36" r="6" stroke="#ef4444" stroke-width="2.5" fill="#000000"/>
+              <path d="M14 36H24L30 24H38" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M22 24L18 16H10" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M30 24L36 36" stroke="#ffffff" stroke-width="2"/>
+              <rect x="7" y="18" width="12" height="12" rx="2" fill="#dc2626" stroke="#ffffff" stroke-width="1.5"/>
+              <path d="M10 24H16" stroke="#ffffff" stroke-width="1.5"/>
+              <path d="M4 14H12M2 20H8M2 26H5" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
             </svg>
-          </a>
-        }
+          </div>
+
+          <h3 class="del-title">Garantía de 30 Minutos</h3>
+          <p class="del-desc">Nuestros repartidores utilizan bolsas térmicas con aislamiento térmico multicapa que preservan la temperatura a más de <strong>75°C</strong>.</p>
+          <div class="del-stat-callout">
+            <span class="stat-num">&lt; 30 MIN</span>
+            <span class="stat-lbl">O tu orden es gratis</span>
+          </div>
+        </div>
+
+        <!-- Card 2: Zonas -->
+        <div class="del-card hover-lift">
+          <div class="del-pill-tag">
+            <span class="pill-dot"></span>
+            <span>COBERTURA TOTAL</span>
+          </div>
+
+          <div class="del-icon-orb">
+            <!-- Modern GPS Radar / Pinpoint SVG -->
+            <svg class="del-svg" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="24" cy="24" r="18" stroke="rgba(220,38,38,0.25)" stroke-width="1.5" stroke-dasharray="3 3"/>
+              <circle cx="24" cy="24" r="12" stroke="rgba(220,38,38,0.4)" stroke-width="1.5"/>
+              <path d="M24 10C19.5 10 16 13.5 16 18C16 23.5 24 34 24 34C24 34 32 23.5 32 18C32 13.5 28.5 10 24 10Z" fill="#dc2626" stroke="#ffffff" stroke-width="1.8"/>
+              <circle cx="24" cy="18" r="3" fill="#ffffff"/>
+              <path d="M24 24L36 12" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+
+          <h3 class="del-title">Zonas de Cobertura</h3>
+          <p class="del-desc">Cubrimos un radio de hasta <strong>12 km</strong> alrededor de nuestra cocina central. Si tu código postal está dentro del área, el envío es gratuito.</p>
+          <div class="del-stat-callout">
+            <span class="stat-num">12 KM RADIO</span>
+            <span class="stat-lbl">Envío Gratis desde $25</span>
+          </div>
+        </div>
+
+        <!-- Card 3: Horarios -->
+        <div class="del-card hover-lift">
+          <div class="del-pill-tag">
+            <span class="pill-dot"></span>
+            <span>HORARIO EXTENDIDO</span>
+          </div>
+
+          <div class="del-icon-orb">
+            <!-- Modern Swiss Luxury Chronometer Dial SVG -->
+            <svg class="del-svg" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="24" cy="24" r="18" stroke="#dc2626" stroke-width="2.2" fill="#000000"/>
+              <path d="M24 8V11M24 37V40M8 24H11M37 24H40" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+              <path d="M24 24L24 14" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M24 24L31 28" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="24" cy="24" r="2.5" fill="#dc2626"/>
+            </svg>
+          </div>
+
+          <h3 class="del-title">Horarios de Atención</h3>
+          <p class="del-desc">Lunes a Domingo ininterrumpido desde las <strong>12:00 PM hasta las 11:00 PM</strong>. Servicio nocturno los fines de semana.</p>
+          <div class="del-stat-callout">
+            <span class="stat-num">7 DÍAS / SEM</span>
+            <span class="stat-lbl">12:00 PM — 11:00 PM</span>
+          </div>
+        </div>
       </div>
-      <div class="social-links">
-        <a
-          href="https://github.com/angular/angular"
-          aria-label="Github"
-          target="_blank"
-          rel="noopener"
-        >
-          <svg
-            width="25"
-            height="24"
-            viewBox="0 0 25 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            alt="Github"
-          >
-            <path
-              d="M12.3047 0C5.50634 0 0 5.50942 0 12.3047C0 17.7423 3.52529 22.3535 8.41332 23.9787C9.02856 24.0946 9.25414 23.7142 9.25414 23.3871C9.25414 23.0949 9.24389 22.3207 9.23876 21.2953C5.81601 22.0377 5.09414 19.6444 5.09414 19.6444C4.53427 18.2243 3.72524 17.8449 3.72524 17.8449C2.61064 17.082 3.81137 17.0973 3.81137 17.0973C5.04697 17.1835 5.69604 18.3647 5.69604 18.3647C6.79321 20.2463 8.57636 19.7029 9.27978 19.3881C9.39052 18.5924 9.70736 18.0499 10.0591 17.7423C7.32641 17.4347 4.45429 16.3765 4.45429 11.6618C4.45429 10.3185 4.9311 9.22133 5.72065 8.36C5.58222 8.04931 5.16694 6.79833 5.82831 5.10337C5.82831 5.10337 6.85883 4.77319 9.2121 6.36459C10.1965 6.09082 11.2424 5.95546 12.2883 5.94931C13.3342 5.95546 14.3801 6.09082 15.3644 6.36459C17.7023 4.77319 18.7328 5.10337 18.7328 5.10337C19.3942 6.79833 18.9789 8.04931 18.8559 8.36C19.6403 9.22133 20.1171 10.3185 20.1171 11.6618C20.1171 16.3888 17.2409 17.4296 14.5031 17.7321C14.9338 18.1012 15.3337 18.8559 15.3337 20.0084C15.3337 21.6552 15.3183 22.978 15.3183 23.3779C15.3183 23.7009 15.5336 24.0854 16.1642 23.9623C21.0871 22.3484 24.6094 17.7341 24.6094 12.3047C24.6094 5.50942 19.0999 0 12.3047 0Z"
-            />
-          </svg>
-        </a>
-        <a
-          href="https://x.com/angular"
-          aria-label="X"
-          target="_blank"
-          rel="noopener"
-        >
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            alt="X"
-          >
-            <path
-              d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
-            />
-          </svg>
-        </a>
-        <a
-          href="https://www.youtube.com/channel/UCbn1OgGei-DV7aSRo_HaAiw"
-          aria-label="Youtube"
-          target="_blank"
-          rel="noopener"
-        >
-          <svg
-            width="29"
-            height="20"
-            viewBox="0 0 29 20"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            alt="Youtube"
-          >
-            <path
-              fill-rule="evenodd"
-              clip-rule="evenodd"
-              d="M27.4896 1.52422C27.9301 1.96749 28.2463 2.51866 28.4068 3.12258C29.0004 5.35161 29.0004 10 29.0004 10C29.0004 10 29.0004 14.6484 28.4068 16.8774C28.2463 17.4813 27.9301 18.0325 27.4896 18.4758C27.0492 18.9191 26.5 19.2389 25.8972 19.4032C23.6778 20 14.8068 20 14.8068 20C14.8068 20 5.93586 20 3.71651 19.4032C3.11363 19.2389 2.56449 18.9191 2.12405 18.4758C1.68361 18.0325 1.36732 17.4813 1.20683 16.8774C0.613281 14.6484 0.613281 10 0.613281 10C0.613281 10 0.613281 5.35161 1.20683 3.12258C1.36732 2.51866 1.68361 1.96749 2.12405 1.52422C2.56449 1.08095 3.11363 0.76113 3.71651 0.596774C5.93586 0 14.8068 0 14.8068 0C14.8068 0 23.6778 0 25.8972 0.596774C26.5 0.76113 27.0492 1.08095 27.4896 1.52422ZM19.3229 10L11.9036 5.77905V14.221L19.3229 10Z"
-            />
-          </svg>
-        </a>
+
+      <!-- BOTÓN HERO DE DELIVERY PROMINENTE Y REFINADO -->
+      <div class="delivery-hero-cta-wrapper">
+        <button class="btn-delivery-hero btn-shimmer" (click)="scrollAlMenu()">
+          <div class="btn-hero-icon-box">
+            <svg class="btn-hero-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+          </div>
+          <div class="btn-hero-text">
+            <span class="btn-hero-subtitle">DESPACHO CALIENTE DIRECTO A TU PUERTA</span>
+            <span class="btn-hero-title">Iniciar Pedido para Delivery</span>
+          </div>
+          <span class="btn-hero-arrow">→</span>
+        </button>
+
+        <div class="delivery-guarantee-strip">
+          <span class="strip-item">✓ Sin cargo de envío en pedidos de $25+</span>
+          <span class="strip-dot">•</span>
+          <span class="strip-item">✓ Seguimiento en vivo por correo Brevo</span>
+          <span class="strip-dot">•</span>
+          <span class="strip-item">✓ Empaque térmico sellado de seguridad</span>
+        </div>
       </div>
     </div>
-  </div>
-</main>
+  }
 
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * The content above * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * is only a placeholder * * * * * * * * * * * -->
-<!-- * * * * * * * * * * and can be replaced.  * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * End of Placeholder  * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+  <!-- VISTA 4 & 5: MI CUENTA / SESIÓN (Incluye Mis Pedidos tras iniciar sesión) -->
+  @if (tabActiva() === 'login' || tabActiva() === 'historial') {
+    <div class="animate-fade-in main-container">
+      <app-login 
+        (irAlMenu)="cambiarTab('menu')"
+        (irAlAdmin)="cambiarTab('admin')">
+      </app-login>
+    </div>
+  }
+
+  <!-- VISTA ADMINISTRADOR: SISTEMA KDS, COCINA & DESPACHO INTERNO -->
+  @if (tabActiva() === 'admin' || tabActiva() === 'kds') {
+    <div class="animate-fade-in">
+      <app-admin-dashboard (irACliente)="cambiarTab('menu')"></app-admin-dashboard>
+    </div>
+  }
+
+  <!-- VISTA 6: EL APARTE TÉCNICO (CÓMO FUNCIONA / ARQUITECTURA & CÓDIGO) -->
+  @if (tabActiva() === 'tech_docs' || tabActiva() === 'arquitectura' || tabActiva() === 'correos') {
+    <div class="animate-fade-in">
+      <app-tech-docs></app-tech-docs>
+    </div>
+  }
+
+  <!-- ================================================================= -->
+  <!-- MODALES Y ELEMENTOS FLOTANTES INTERACTIVOS                       -->
+  <!-- ================================================================= -->
+
+    <!-- MODAL: PERSONALIZA & CONFIRMA TU ORDEN -->
+  @if (modalPedidoAbierto()) {
+    <app-pedido-form 
+      [pizzaPreset]="pizzaSeleccionada()"
+      (cerrar)="cerrarModalPedido()"
+      (pedidoExitoso)="alCompletarPedido($event)">
+    </app-pedido-form>
+  }
 
 
-<router-outlet />
+
+  <!-- MODAL 2: CUPÓN PROMOCIONAL MINIMALISTA -->
+  @if (modalCuponAbierto() && cuponActual(); as cup) {
+    <div class="modal-overlay-bg" (click)="cerrarModalCupon()">
+      <div class="modal-cupon-box animate-pop-in" (click)="$event.stopPropagation()">
+        <button class="btn-modal-close" (click)="cerrarModalCupon()">✕</button>
+        
+        <div class="cupon-sparkle-orb">
+          <svg class="cupon-sparkle-svg" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="6" y="8" width="28" height="24" rx="4" fill="#121212" stroke="#dc2626" stroke-width="2"/>
+            <path d="M15 8V32" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="2 2"/>
+            <circle cx="6" cy="20" r="3" fill="#000000"/>
+            <circle cx="34" cy="20" r="3" fill="#000000"/>
+            <polygon points="25,12 26.5,16 30.5,17.5 26.5,19 25,23 23.5,19 19.5,17.5 23.5,16" fill="#ef4444"/>
+          </svg>
+        </div>
+        <span class="badge-sub">Cupón Exclusivo de Cortesía</span>
+        <h2 class="cupon-title">{{ cup.titulo }}</h2>
+        <p class="cupon-desc">{{ cup.descripcion }}</p>
+
+        <div class="cupon-code-container">
+          <span class="cupon-code-text">{{ cup.codigo }}</span>
+          <button class="btn-copy-code btn-shimmer" (click)="copiarCupon(cup.codigo)">
+            {{ cuponCopiado() ? '✓ Copiado' : 'Copiar Código' }}
+          </button>
+        </div>
+
+        <p class="cupon-instruccion">
+          Aplica este código o selecciona tus pizzas; el descuento se reflejará al confirmar.
+        </p>
+
+        <button class="btn-use-cupon btn-shimmer" (click)="cerrarModalCupon(); scrollAlMenu()">
+          <span>¡Usar Cupón y Ver Menú!</span>
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- CUADRO FLOTANTE 1: CARRITO / RESUMEN DESPLEGABLE (SLIDE-OVER DRAWER) -->
+  @if (drawerCarritoAbierto()) {
+    <div class="drawer-backdrop" (click)="toggleCarrito()">
+      <aside class="slide-over-drawer" (click)="$event.stopPropagation()">
+        <div class="drawer-header">
+          <div class="d-head-left">
+            <span class="d-icon-orb">
+              <svg class="d-cart-svg" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="21" r="1"/>
+                <circle cx="20" cy="21" r="1"/>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+              </svg>
+            </span>
+            <h3>Tu Orden Actual</h3>
+          </div>
+          <button class="btn-drawer-close" (click)="toggleCarrito()">✕</button>
+        </div>
+
+        <div class="drawer-body">
+          @if (pizzaSeleccionada(); as pz) {
+            <div class="drawer-item-card">
+              <div class="d-item-top">
+                <span class="d-item-emoji">{{ pz.imagen }}</span>
+                <div class="d-item-meta">
+                  <h4>{{ pz.nombre }}</h4>
+                  <span class="d-item-price">\${{ pz.precio | number:'1.2-2' }}</span>
+                </div>
+              </div>
+              <p class="d-item-ing">{{ pz.ingredientes.join(', ') }}</p>
+              <div class="d-item-tags">
+                <span class="d-tag">Masa Madre 48h</span>
+                <span class="d-tag">Forno a Legna</span>
+              </div>
+            </div>
+          } @else {
+            <div class="drawer-empty">
+              <span class="d-empty-icon">🍕</span>
+              <h4>Aún no has seleccionado una pizza</h4>
+              <p>Explora la carta y agrega tu combinación favorita en 1 clic.</p>
+              <button class="btn-drawer-explore btn-shimmer" (click)="toggleCarrito(); scrollAlMenu()">
+                Ver Carta d'Autore
+              </button>
+            </div>
+          }
+
+          <!-- Costos -->
+          @if (pizzaSeleccionada(); as pz) {
+            <div class="drawer-costs">
+              <div class="cost-row">
+                <span>Subtotal Pizza:</span>
+                <span>\${{ pz.precio | number:'1.2-2' }}</span>
+              </div>
+              <div class="cost-row">
+                <span>Envío Artesanal Express:</span>
+                <span class="text-gold font-bold">CORTESÍA ($0.00)</span>
+              </div>
+              <div class="cost-row total-row">
+                <span>Total Estimado:</span>
+                <span class="total-val">\${{ pz.precio | number:'1.2-2' }}</span>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="drawer-footer">
+          <button class="btn-checkout-drawer btn-shimmer" (click)="toggleCarrito(); abrirModalPedido()">
+            <span>Proceder al Checkout y Confirmar</span>
+          </button>
+        </div>
+      </aside>
+    </div>
+  }
+
+  <!-- BOTÓN FLOTANTE DEL CARRITO (Bottom Right) -->
+  <aside class="floating-cart-pill hover-lift" (click)="toggleCarrito()" title="Ver tu orden actual y proceder al pago">
+    <div class="f-cart-content">
+      <span class="f-cart-icon">🛒</span>
+      <div class="f-cart-text">
+        <span class="f-cart-title">Tu Orden</span>
+        <span class="f-cart-amount">
+          {{ pizzaSeleccionada() ? '$' + (pizzaSeleccionada()?.precio | number:'1.2-2') : '0 items' }}
+        </span>
+      </div>
+      @if (pizzaSeleccionada()) {
+        <span class="cart-dot-pulse"></span>
+      }
+    </div>
+  </aside>
+
+  <!-- BOTÓN FLOTANTE DEL DEVPORTAL / ARQUITECTURA (Bottom Left) -->
+  <aside 
+    class="floating-dev-pill hover-lift" 
+    (click)="cambiarTab('tech_docs')"
+    title="Abrir el DevPortal: Arquitectura Hexagonal, Spring Boot, Cookies y Hash/Bash">
+    <div class="f-dev-content">
+      <span class="f-dev-icon">🛠️</span>
+      <div class="f-dev-text">
+        <span class="f-dev-title">DevPortal</span>
+        <span class="f-dev-sub">Arquitectura & Código</span>
+      </div>
+      <span class="f-dev-badge">DEV</span>
+    </div>
+  </aside>
+
+  <!-- Modal Global de Notificación de Envío Brevo -->
+  <app-mail-notification></app-mail-notification>
+
+  <!-- FOOTER COMERCIAL DE PIZZABYTE -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <!-- Columna Marca -->
+      <div class="footer-col">
+        <div class="footer-brand">
+          <div class="footer-logo-crest">
+            <img src="logo-pizzabyte.png" alt="PizzaByte Logo" class="footer-logo-img" />
+          </div>
+          <strong>Pizza<span class="brand-accent">Byte</span></strong>
+        </div>
+        <p class="footer-desc">
+          Atelier gastronómico artesanal horneado a la piedra con masa madre viva de fermentación lenta de 48 horas. Sabor auténtico e ingredientes de primera calidad.
+        </p>
+        <div class="social-links">
+          <span>📘 Facebook</span>
+          <span>📸 Instagram</span>
+          <span>🎵 TikTok</span>
+        </div>
+      </div>
+
+      <!-- Columna Menú & Horarios -->
+      <div class="footer-col">
+        <h5 class="f-title">Horarios de Cocina</h5>
+        <ul class="f-links">
+          <li><strong>Lunes a Jueves:</strong> 12:00 PM - 10:30 PM</li>
+          <li><strong>Viernes y Sábados:</strong> 12:00 PM - 11:30 PM</li>
+          <li><strong>Domingos:</strong> 12:00 PM - 10:00 PM</li>
+          <li>🛵 Delivery activo todos los días</li>
+        </ul>
+      </div>
+
+      <!-- Columna Contacto & Pedidos -->
+      <div class="footer-col">
+        <h5 class="f-title">Atención & Pedidos</h5>
+        <ul class="f-links">
+          <li>📞 <strong>Central Concierge:</strong> (555) 890-BYTE</li>
+          <li>📱 <strong>WhatsApp Directo:</strong> +52 55 9876 5432</li>
+          <li>✉️ <strong>Atención al Cliente:</strong> brandooliver4@gmail.com</li>
+          <li>📍 Sucursal Central: Av. Artesanal #1024</li>
+        </ul>
+      </div>
+
+      <!-- Columna Técnica (El Aparte para Desarrolladores) -->
+      <div class="footer-col tech-col">
+        <h5 class="f-title">Ingeniería del Sistema</h5>
+        <p class="f-tech-sub">PizzaByte está construido bajo estándares empresariales:</p>
+        <ul class="f-tech-links">
+          <li (click)="cambiarTab('tech_docs')">⬡ Arquitectura Hexagonal (Ports & Adapters)</li>
+          <li (click)="cambiarTab('tech_docs')">☕ Spring Boot (CrearPedidoUseCase, Puertos)</li>
+          <li (click)="cambiarTab('tech_docs')">📧 Brevo REST API v3 (Envío Real de Correos)</li>
+          <li (click)="cambiarTab('tech_docs')">🍪 Cookies Persistentes (7 Días) & .txt</li>
+          <li (click)="cambiarTab('tech_docs')">💻 Hashes SHA-256 & Scripts Bash/PowerShell</li>
+          <li (click)="cambiarTab('tech_docs')">📄 Manual de 12 Páginas en Word (.docx)</li>
+        </ul>
+        <button class="btn-footer-tech" (click)="cambiarTab('tech_docs')">
+          <span>🛠️ Abrir Portal de Arquitectura & Código</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Copyright & Staff Terminal Link -->
+    <div class="footer-bottom">
+      <div class="bottom-container">
+        <span>© 2026 PizzaByte Atelier Artigianale. Todos los derechos reservados.</span>
+        <div class="bottom-legal-right">
+          <span>Desarrollado con Angular 21, Spring Boot y Brevo REST API v3</span>
+          <a href="#admin" (click)="cambiarTab('admin'); $event.preventDefault()" class="footer-staff-link" title="Terminal Operativo KDS de Cocina (Personal Autorizado)">
+            🔒 Terminal KDS
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</div>

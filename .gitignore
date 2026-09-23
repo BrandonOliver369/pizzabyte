@@ -42,3 +42,8 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+~$*
+
+# Temporary files
+temp_sessions/
+test*.docx
