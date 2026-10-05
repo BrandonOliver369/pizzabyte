@@ -3,6 +3,7 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const db = require('./db');
 
 const PORT = 8080;
 const BREVO_API_KEY = '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';
@@ -240,12 +241,28 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // 0. GET /api/db/status (Verificación de Conexión a PostgreSQL 18)
+  if (req.method === 'GET' && req.url === '/api/db/status') {
+    const isConn = db.isDbConnected();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      conectado: isConn,
+      motor: 'PostgreSQL 18',
+      baseDeDatos: process.env.DB_NAME || 'pizzabyte_db',
+      esquema: process.env.DB_SCHEMA || 'pizzabyte_core',
+      host: `${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || '5432'}`,
+      normalizacion: '3NF (Tercera Forma Normal)',
+      estado: isConn ? 'OPERATIVO_CONECTADO' : 'MODO_FALLBACK_MEMORIA'
+    }));
+    return;
+  }
+
   // Rutas de Autenticación
   // 1. POST /api/auth/login
   if (req.method === 'POST' && req.url === '/api/auth/login') {
     let body = '';
     req.on('data', chunk => { body += chunk; });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const { username, password, recordar } = JSON.parse(body || '{}');
         const hashRecibido = crypto.createHash('sha256').update(password || '').digest('hex');
@@ -253,7 +270,12 @@ const server = http.createServer(async (req, res) => {
         console.log(` [Auth / Login] Intento de login para usuario: "${username}"`);
         console.log(` [Hash] SHA-256 de la contraseña ingresada: ${hashRecibido}`);
 
-        const usuario = USUARIOS.find(u => u.username.toLowerCase() === (username || '').toLowerCase());
+        // 1. Buscar en PostgreSQL
+        let usuario = await db.buscarUsuario(username);
+        if (!usuario) {
+          // Fallback en memoria si la DB está desconectada
+          usuario = USUARIOS.find(u => u.username.toLowerCase() === (username || '').toLowerCase());
+        }
 
         if (!usuario || usuario.passwordHash !== hashRecibido) {
           console.warn(` [Auth / Login] Credenciales invalidas para: "${username}"`);
@@ -278,6 +300,11 @@ const server = http.createServer(async (req, res) => {
           expiresAt: expiresDate.toISOString()
         });
 
+        // Persistir sesión en PostgreSQL
+        if (usuario.id) {
+          await db.guardarSesion(usuario.id, token, expiresDate);
+        }
+
         // Crear carpeta temporal y guardar el archivo .txt
         const infoTxt = escribirArchivoSesionTxt(usuario, token);
 
@@ -300,7 +327,8 @@ const server = http.createServer(async (req, res) => {
           hash: usuario.passwordHash,
           archivoTxt: infoTxt,
           vigenciaSegundos: maxAge,
-          expira: expiresDate.toISOString()
+          expira: expiresDate.toISOString(),
+          dbPersisted: !!usuario.id
         }));
       } catch (err) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -314,7 +342,7 @@ const server = http.createServer(async (req, res) => {
   if (req.method === 'POST' && req.url === '/api/auth/register') {
     let body = '';
     req.on('data', chunk => { body += chunk; });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const { nombre, username, email, password, rol } = JSON.parse(body || '{}');
 
@@ -325,7 +353,10 @@ const server = http.createServer(async (req, res) => {
         }
 
         const limpioUser = username.trim().toLowerCase();
-        const existe = USUARIOS.find(u => u.username.toLowerCase() === limpioUser || u.email.toLowerCase() === email.trim().toLowerCase());
+        let existe = await db.buscarUsuario(limpioUser);
+        if (!existe) {
+          existe = USUARIOS.find(u => u.username.toLowerCase() === limpioUser || u.email.toLowerCase() === email.trim().toLowerCase());
+        }
         if (existe) {
           res.writeHead(409, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ success: false, mensaje: 'El nombre de usuario o correo ya está registrado' }));
@@ -333,13 +364,23 @@ const server = http.createServer(async (req, res) => {
         }
 
         const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
-        const nuevoUsuario = {
+        let nuevoUsuario = {
           username: limpioUser,
           passwordHash,
           nombre: nombre.trim(),
           email: email.trim(),
           rol: rol || 'CLIENTE_VIP'
         };
+
+        try {
+          const dbUser = await db.registrarUsuario(nuevoUsuario);
+          if (dbUser && dbUser.id) {
+            nuevoUsuario.id = dbUser.id;
+          }
+          console.log(` [PostgreSQL] Usuario "${nuevoUsuario.username}" registrado exitosamente en la base de datos.`);
+        } catch (dbErr) {
+          console.warn('[PostgreSQL] Registro en DB falló, usando memoria:', dbErr.message);
+        }
 
         USUARIOS.push(nuevoUsuario);
         console.log(` [Auth / Register] Nuevo usuario registrado: "${nuevoUsuario.username}" (${nuevoUsuario.rol})`);
@@ -356,6 +397,10 @@ const server = http.createServer(async (req, res) => {
           createdAt: new Date().toISOString(),
           expiresAt: expiresDate.toISOString()
         });
+
+        if (nuevoUsuario.id) {
+          await db.guardarSesion(nuevoUsuario.id, token, expiresDate);
+        }
 
         const infoTxt = escribirArchivoSesionTxt(nuevoUsuario, token);
 
@@ -374,7 +419,8 @@ const server = http.createServer(async (req, res) => {
           hash: passwordHash,
           archivoTxt: infoTxt,
           vigenciaSegundos: maxAge,
-          expira: expiresDate.toISOString()
+          expira: expiresDate.toISOString(),
+          dbPersisted: !!nuevoUsuario.id
         }));
       } catch (err) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -647,7 +693,19 @@ const server = http.createServer(async (req, res) => {
         console.log(` [PedidoController] POST /api/pizzas/ordenar recibido`);
         console.log(` [CrearPedidoUseCase] Procesando orden #${id} (${pedido.saborPizza})`);
         console.log(` [Pago] Método: ${pedido.metodoPago} | Estado: ${pedido.estadoPago} ${pedido.idTransaccionPaypal ? '| ID: ' + pedido.idTransaccionPaypal : ''}`);
-        console.log(` [PedidoDatabaseAdapter] Guardando en persistencia...`);
+        
+        // Persistir en PostgreSQL
+        try {
+          const resDb = await db.guardarNuevoPedido(pedido);
+          if (resDb && resDb.id) {
+            pedido.id = resDb.id;
+            pedido.dbPersisted = true;
+          }
+        } catch (dbErr) {
+          console.warn(' [PostgreSQL] Error al guardar en DB, usando memoria:', dbErr.message);
+        }
+
+        console.log(` [PedidoDatabaseAdapter] Guardado en persistencia (ID: ${pedido.id})`);
         console.log(` [MailAdapter / Brevo API] Enviando correo a: ${pedido.correoCliente}`);
         console.log(` [MailAdapter / Brevo API] Mensaje: Tu pizza de ${pedido.saborPizza} está en camino.`);
 
@@ -671,6 +729,16 @@ const server = http.createServer(async (req, res) => {
 
   // 6. GET /api/pizzas/pedidos (Listado de órdenes para la administración / KDS)
   if (req.method === 'GET' && req.url === '/api/pizzas/pedidos') {
+    try {
+      const dbPedidos = await db.obtenerPedidosKds();
+      if (dbPedidos && dbPedidos.length > 0) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(dbPedidos));
+        return;
+      }
+    } catch (err) {
+      console.warn(' [PostgreSQL] Fallback a memoria para pedidos:', err.message);
+    }
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(PEDIDOS_DB));
     return;
@@ -682,19 +750,24 @@ const server = http.createServer(async (req, res) => {
     const id = parseInt(parts[4], 10);
     let body = '';
     req.on('data', chunk => { body += chunk; });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const { estado, usuario } = JSON.parse(body || '{}');
+        
+        try {
+          await db.actualizarEstadoPedido(id, estado);
+        } catch (dbErr) {
+          console.warn(' [PostgreSQL] Error al actualizar estado en DB:', dbErr.message);
+        }
+
         const pedido = PEDIDOS_DB.find(p => p.id === id);
         if (pedido) {
           pedido.estado = estado;
-          console.log(` [KDS / Admin] Pedido #${id} actualizado a [${estado}] por ${usuario || 'Admin'}`);
-          res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ success: true, pedido }));
-        } else {
-          res.writeHead(404, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ success: false, error: 'Pedido no encontrado' }));
         }
+
+        console.log(` [KDS / Admin] Pedido #${id} actualizado a [${estado}] por ${usuario || 'Admin'}`);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, id, estado, actualizadoPor: usuario || 'Admin' }));
       } catch (err) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: false, error: err.message }));
@@ -755,12 +828,14 @@ const server = http.createServer(async (req, res) => {
 
 asegurarCarpetaTemporal();
 
-server.listen(PORT, () => {
+server.listen(PORT, async () => {
   console.log(` ========================================================`);
   console.log(` [PizzaByte Backend] Servidor Hexagonal escuchando en http://localhost:${PORT}`);
   console.log(` [Auth Module] Sistema de Login con Cookies Persistentes activo`);
   console.log(` [Carpeta Temporal] Almacenando sesiones en: ${TEMP_DIR}`);
   console.log(` [Hash SHA-256] Contraseñas cifradas activas (admin/pizza123, brandon/byte2026)`);
   console.log(` [Brevo API v3] Remitente verificado: ${BREVO_SENDER}`);
+  console.log(` [PostgreSQL 18] Conexión a Base de Datos en progreso...`);
   console.log(` ========================================================`);
+  await db.probarConexion();
 });

@@ -47,3 +47,4 @@ Thumbs.db
 # Temporary files
 temp_sessions/
 test*.docx
+.env
