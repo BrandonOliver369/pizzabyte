@@ -1,9 +1,16 @@
-<p>pedir-bebidas works!</p>
-@if (bebida()){
-
-
-
-
-
-    
-}
+<div class="p-3 bg-white rounded shadow-sm border border-slate-200">
+  <p class="text-xs text-slate-500 font-semibold uppercase">Módulo de Bebidas</p>
+  @if (bebida()) {
+    <div class="mt-1">
+      <h4 class="font-bold text-slate-800">{{ bebida()?.nombre }}</h4>
+      <p class="text-sm text-slate-600">{{ bebida()?.descripcion }} - {{ bebida()?.tamano }}</p>
+      <p class="text-sm font-bold text-emerald-600">${{ bebida()?.precio }} USD</p>
+    </div>
+  } @else {
+    <div class="mt-1">
+      <h4 class="font-bold text-slate-800">{{ coca.nombre }}</h4>
+      <p class="text-sm text-slate-600">{{ coca.descripcion }} - {{ coca.tamano }}</p>
+      <p class="text-sm font-bold text-emerald-600">${{ coca.precio }} USD</p>
+    </div>
+  }
+</div>
