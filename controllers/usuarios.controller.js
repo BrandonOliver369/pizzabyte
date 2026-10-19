@@ -3,6 +3,8 @@
  * CONTROLADOR 5: USUARIOS (CRUD)
  * ==============================================================================
  * Operaciones CRUD completas sobre la tabla 'pizzabyte_core.usuarios'
+ * Columnas exactas del esquema normalizado 3NF:
+ * id, username, email, password_hash, nombre_completo, telefono, rol_id, activo, creado_en, actualizado_en
  */
 
 const crypto = require('crypto');
@@ -13,13 +15,13 @@ function responder(res, status, data) {
   res.end(JSON.stringify(data));
 }
 
-// 1. READ ALL - Listar usuarios (sin exponer contraseñas)
+// 1. READ ALL - Listar usuarios (sin exponer hash de contraseñas)
 async function listar(req, res) {
   try {
     const query = `
       SELECT u.id, u.username, u.email, u.nombre_completo, u.telefono,
              r.codigo AS rol_codigo, r.nombre AS rol_nombre,
-             u.proveedor_auth, u.activo, u.fecha_creacion
+             u.activo, u.creado_en, u.actualizado_en
       FROM usuarios u
       JOIN roles r ON u.rol_id = r.id
       ORDER BY u.id ASC
@@ -41,7 +43,7 @@ async function obtenerPorId(req, res, id) {
     const query = `
       SELECT u.id, u.username, u.email, u.nombre_completo, u.telefono,
              r.codigo AS rol_codigo, r.nombre AS rol_nombre,
-             u.proveedor_auth, u.avatar_url, u.activo, u.fecha_creacion
+             u.activo, u.creado_en, u.actualizado_en
       FROM usuarios u
       JOIN roles r ON u.rol_id = r.id
       WHERE u.id = $1
@@ -56,7 +58,7 @@ async function obtenerPorId(req, res, id) {
   }
 }
 
-// 3. CREATE - Registrar nuevo usuario
+// 3. CREATE - Registrar nuevo usuario con hash SHA-256
 async function crear(req, res, body) {
   try {
     const { username, email, password, nombre_completo, telefono, rol_codigo } = body;
@@ -64,28 +66,32 @@ async function crear(req, res, body) {
       return responder(res, 400, { success: false, mensaje: 'username, email y password son obligatorios' });
     }
 
-    const hash = crypto.createHash('sha256').update(password).digest('hex');
-    const rolRes = await pool.query('SELECT id FROM roles WHERE codigo = $1 LIMIT 1', [rol_codigo || 'CLIENTE_VIP']);
+    // Hashear contraseña con SHA-256
+    const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
+
+    // Obtener rol_id a partir del código
+    const rolRes = await pool.query('SELECT id FROM roles WHERE codigo = $1 LIMIT 1', [rol_codigo || 'CLIENTE']);
     const rolId = rolRes.rows[0] ? rolRes.rows[0].id : 2;
 
     const query = `
-      INSERT INTO usuarios (username, email, password_hash, nombre_completo, telefono, rol_id)
-      VALUES ($1, $2, $3, $4, $5, $6)
-      RETURNING id, username, email, nombre_completo, telefono, rol_id, fecha_creacion
+      INSERT INTO usuarios (username, email, password_hash, nombre_completo, telefono, rol_id, activo)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING id, username, email, nombre_completo, telefono, rol_id, activo, creado_en
     `;
     const valores = [
       username.toLowerCase().trim(),
       email.toLowerCase().trim(),
-      hash,
+      passwordHash,
       nombre_completo || username,
       telefono || null,
-      rolId
+      rolId,
+      true
     ];
 
     const resultado = await pool.query(query, valores);
     responder(res, 201, {
       success: true,
-      mensaje: 'Usuario creado exitosamente en PostgreSQL',
+      mensaje: 'Usuario registrado exitosamente en PostgreSQL',
       data: resultado.rows[0]
     });
   } catch (err) {
@@ -93,26 +99,27 @@ async function crear(req, res, body) {
   }
 }
 
-// 4. UPDATE - Actualizar datos del usuario
+// 4. UPDATE - Actualizar datos de usuario
 async function actualizar(req, res, id, body) {
   try {
-    const { nombre_completo, telefono, password, activo } = body;
-    let newHash = null;
+    const { nombre_completo, telefono, activo, password } = body;
+    let passwordHash = null;
     if (password) {
-      newHash = crypto.createHash('sha256').update(password).digest('hex');
+      passwordHash = crypto.createHash('sha256').update(password).digest('hex');
     }
 
     const query = `
       UPDATE usuarios
       SET nombre_completo = COALESCE($1, nombre_completo),
           telefono = COALESCE($2, telefono),
-          password_hash = COALESCE($3, password_hash),
-          activo = COALESCE($4, activo),
-          fecha_actualizacion = CURRENT_TIMESTAMP
+          activo = COALESCE($3, activo),
+          password_hash = COALESCE($4, password_hash),
+          actualizado_en = CURRENT_TIMESTAMP
       WHERE id = $5
-      RETURNING id, username, email, nombre_completo, telefono, activo, fecha_actualizacion
+      RETURNING id, username, email, nombre_completo, telefono, activo, actualizado_en
     `;
-    const resultado = await pool.query(query, [nombre_completo, telefono, newHash, activo, id]);
+    const valores = [nombre_completo, telefono, activo, passwordHash, id];
+    const resultado = await pool.query(query, valores);
 
     if (resultado.rows.length === 0) {
       return responder(res, 404, { success: false, mensaje: `Usuario #${id} no encontrado para actualizar` });
@@ -128,7 +135,7 @@ async function actualizar(req, res, id, body) {
   }
 }
 
-// 5. DELETE - Desactivar o eliminar usuario
+// 5. DELETE - Eliminar usuario
 async function eliminar(req, res, id) {
   try {
     const query = `DELETE FROM usuarios WHERE id = $1 RETURNING id, username`;

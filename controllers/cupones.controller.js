@@ -3,6 +3,8 @@
  * CONTROLADOR 3: CUPONES DE DESCUENTO (CRUD)
  * ==============================================================================
  * Operaciones CRUD completas sobre la tabla 'pizzabyte_core.cupones_descuento'
+ * Columnas exactas del esquema normalizado 3NF:
+ * id, codigo, porcentaje_descuento, monto_minimo_compra, usos_maximos, usos_actuales, activo, fecha_expiracion
  */
 
 const { pool } = require('../db');
@@ -16,8 +18,8 @@ function responder(res, status, data) {
 async function listar(req, res) {
   try {
     const query = `
-      SELECT id, codigo, porcentaje_descuento, monto_fijo_descuento, 
-             monto_minimo_compra, usos_maximos, activo, fecha_expiracion
+      SELECT id, codigo, porcentaje_descuento, monto_minimo_compra, 
+             usos_maximos, usos_actuales, activo, fecha_expiracion
       FROM cupones_descuento
       ORDER BY id ASC
     `;
@@ -56,24 +58,23 @@ async function obtenerPorId(req, res, id) {
 // 3. CREATE - Insertar nuevo cupón
 async function crear(req, res, body) {
   try {
-    const { codigo, porcentaje_descuento, monto_fijo_descuento, monto_minimo_compra, usos_maximos, activo, fecha_expiracion } = body;
-    if (!codigo) {
-      return responder(res, 400, { success: false, mensaje: 'El campo codigo es obligatorio' });
+    const { codigo, porcentaje_descuento, monto_minimo_compra, usos_maximos, activo, fecha_expiracion } = body;
+    if (!codigo || porcentaje_descuento === undefined) {
+      return responder(res, 400, { success: false, mensaje: 'codigo y porcentaje_descuento son obligatorios' });
     }
 
     const query = `
-      INSERT INTO cupones_descuento (codigo, porcentaje_descuento, monto_fijo_descuento, monto_minimo_compra, usos_maximos, activo, fecha_expiracion)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      INSERT INTO cupones_descuento (codigo, porcentaje_descuento, monto_minimo_compra, usos_maximos, activo, fecha_expiracion)
+      VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *
     `;
     const valores = [
       codigo.toUpperCase().trim(),
-      porcentaje_descuento || 0.00,
-      monto_fijo_descuento || 0.00,
-      monto_minimo_compra || 0.00,
-      usos_maximos || 500,
+      parseFloat(porcentaje_descuento),
+      monto_minimo_compra !== undefined ? parseFloat(monto_minimo_compra) : 0.00,
+      usos_maximos !== undefined ? parseInt(usos_maximos, 10) : 100,
       activo !== false,
-      fecha_expiracion || '2026-12-31 23:59:59+00'
+      fecha_expiracion || null
     ];
 
     const resultado = await pool.query(query, valores);
@@ -87,23 +88,30 @@ async function crear(req, res, body) {
   }
 }
 
-// 4. UPDATE - Actualizar cupón existente
+// 4. UPDATE - Actualizar cupón
 async function actualizar(req, res, id, body) {
   try {
-    const { codigo, porcentaje_descuento, monto_fijo_descuento, monto_minimo_compra, usos_maximos, activo, fecha_expiracion } = body;
+    const { codigo, porcentaje_descuento, monto_minimo_compra, usos_maximos, activo, fecha_expiracion } = body;
     const query = `
-      UPDATE cupones_descuento 
+      UPDATE cupones_descuento
       SET codigo = COALESCE($1, codigo),
           porcentaje_descuento = COALESCE($2, porcentaje_descuento),
-          monto_fijo_descuento = COALESCE($3, monto_fijo_descuento),
-          monto_minimo_compra = COALESCE($4, monto_minimo_compra),
-          usos_maximos = COALESCE($5, usos_maximos),
-          activo = COALESCE($6, activo),
-          fecha_expiracion = COALESCE($7, fecha_expiracion)
-      WHERE id = $8
+          monto_minimo_compra = COALESCE($3, monto_minimo_compra),
+          usos_maximos = COALESCE($4, usos_maximos),
+          activo = COALESCE($5, activo),
+          fecha_expiracion = COALESCE($6, fecha_expiracion)
+      WHERE id = $7
       RETURNING *
     `;
-    const valores = [codigo ? codigo.toUpperCase().trim() : null, porcentaje_descuento, monto_fijo_descuento, monto_minimo_compra, usos_maximos, activo, fecha_expiracion, id];
+    const valores = [
+      codigo ? codigo.toUpperCase().trim() : null,
+      porcentaje_descuento !== undefined ? parseFloat(porcentaje_descuento) : null,
+      monto_minimo_compra !== undefined ? parseFloat(monto_minimo_compra) : null,
+      usos_maximos !== undefined ? parseInt(usos_maximos, 10) : null,
+      activo,
+      fecha_expiracion,
+      id
+    ];
     const resultado = await pool.query(query, valores);
 
     if (resultado.rows.length === 0) {
@@ -120,7 +128,7 @@ async function actualizar(req, res, id, body) {
   }
 }
 
-// 5. DELETE - Eliminar cupón
+// 5. DELETE - Dar de baja o eliminar cupón
 async function eliminar(req, res, id) {
   try {
     const query = `DELETE FROM cupones_descuento WHERE id = $1 RETURNING id, codigo`;
@@ -132,7 +140,7 @@ async function eliminar(req, res, id) {
 
     responder(res, 200, {
       success: true,
-      mensaje: `Cupón #${id} (${resultado.rows[0].codigo}) eliminado exitosamente`,
+      mensaje: `Cupón #${id} (${resultado.rows[0].codigo}) eliminado de la base de datos`,
       data: resultado.rows[0]
     });
   } catch (err) {

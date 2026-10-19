@@ -3,22 +3,23 @@
  * CONTROLADOR 1: PRODUCTOS (CRUD)
  * ==============================================================================
  * Operaciones CRUD completas sobre la tabla 'pizzabyte_core.productos'
+ * Columnas exactas del esquema normalizado 3NF:
+ * id, categoria_id, nombre, descripcion, precio_base, imagen_url, disponible, creado_en
  */
 
 const { pool } = require('../db');
 
-// Helper para responder en JSON
 function responder(res, status, data) {
   res.writeHead(status, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify(data));
 }
 
-// 1. READ ALL - Obtener todos los productos
+// 1. READ ALL - Obtener todos los productos del catálogo
 async function listar(req, res) {
   try {
     const query = `
-      SELECT p.id, p.nombre, p.subtitulo_italiano, p.descripcion, 
-             p.precio_base, p.foto_url, p.es_popular, p.disponible, p.fecha_creacion,
+      SELECT p.id, p.nombre, p.descripcion, p.precio_base, 
+             p.imagen_url, p.disponible, p.creado_en, p.categoria_id,
              c.nombre AS categoria_nombre
       FROM productos p
       JOIN categorias c ON p.categoria_id = c.id
@@ -35,12 +36,12 @@ async function listar(req, res) {
   }
 }
 
-// 2. READ ONE - Obtener producto por ID (con sus ingredientes asociados)
+// 2. READ ONE - Obtener producto por ID (con su receta e ingredientes)
 async function obtenerPorId(req, res, id) {
   try {
     const query = `
-      SELECT p.id, p.nombre, p.subtitulo_italiano, p.descripcion, 
-             p.precio_base, p.foto_url, p.es_popular, p.disponible, p.categoria_id,
+      SELECT p.id, p.nombre, p.descripcion, p.precio_base, 
+             p.imagen_url, p.disponible, p.creado_en, p.categoria_id,
              c.nombre AS categoria_nombre
       FROM productos p
       JOIN categorias c ON p.categoria_id = c.id
@@ -51,9 +52,10 @@ async function obtenerPorId(req, res, id) {
       return responder(res, 404, { success: false, mensaje: `Producto #${id} no encontrado` });
     }
 
-    // Obtener ingredientes de la receta
+    // Obtener ingredientes vinculados en producto_ingredientes
     const ingQuery = `
-      SELECT i.id, i.nombre, i.precio_adicional, i.es_vegetariano, i.es_picante
+      SELECT i.id, i.nombre, i.costo_extra, i.stock_disponible, i.unidad_medida,
+             pi.es_obligatorio, pi.cantidad_estandar
       FROM producto_ingredientes pi
       JOIN ingredientes i ON pi.ingrediente_id = i.id
       WHERE pi.producto_id = $1
@@ -69,27 +71,25 @@ async function obtenerPorId(req, res, id) {
   }
 }
 
-// 3. CREATE - Insertar un nuevo producto
+// 3. CREATE - Insertar una nueva pizza/producto
 async function crear(req, res, body) {
   try {
-    const { categoria_id, nombre, subtitulo_italiano, descripcion, precio_base, foto_url, es_popular, disponible } = body;
-    if (!nombre || !precio_base) {
+    const { categoria_id, nombre, descripcion, precio_base, imagen_url, disponible } = body;
+    if (!nombre || precio_base === undefined) {
       return responder(res, 400, { success: false, mensaje: 'nombre y precio_base son obligatorios' });
     }
 
     const query = `
-      INSERT INTO productos (categoria_id, nombre, subtitulo_italiano, descripcion, precio_base, foto_url, es_popular, disponible)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      INSERT INTO productos (categoria_id, nombre, descripcion, precio_base, imagen_url, disponible)
+      VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *
     `;
     const valores = [
       categoria_id || 1,
       nombre,
-      subtitulo_italiano || null,
       descripcion || 'Pizza artesanal de autor',
-      precio_base,
-      foto_url || null,
-      es_popular || false,
+      parseFloat(precio_base),
+      imagen_url || null,
       disponible !== false
     ];
 
@@ -104,24 +104,30 @@ async function crear(req, res, body) {
   }
 }
 
-// 4. UPDATE - Actualizar producto existente
+// 4. UPDATE - Modificar producto existente
 async function actualizar(req, res, id, body) {
   try {
-    const { nombre, subtitulo_italiano, descripcion, precio_base, foto_url, es_popular, disponible, categoria_id } = body;
+    const { nombre, descripcion, precio_base, imagen_url, disponible, categoria_id } = body;
     const query = `
       UPDATE productos 
       SET nombre = COALESCE($1, nombre),
-          subtitulo_italiano = COALESCE($2, subtitulo_italiano),
-          descripcion = COALESCE($3, descripcion),
-          precio_base = COALESCE($4, precio_base),
-          foto_url = COALESCE($5, foto_url),
-          es_popular = COALESCE($6, es_popular),
-          disponible = COALESCE($7, disponible),
-          categoria_id = COALESCE($8, categoria_id)
-      WHERE id = $9
+          descripcion = COALESCE($2, descripcion),
+          precio_base = COALESCE($3, precio_base),
+          imagen_url = COALESCE($4, imagen_url),
+          disponible = COALESCE($5, disponible),
+          categoria_id = COALESCE($6, categoria_id)
+      WHERE id = $7
       RETURNING *
     `;
-    const valores = [nombre, subtitulo_italiano, descripcion, precio_base, foto_url, es_popular, disponible, categoria_id, id];
+    const valores = [
+      nombre,
+      descripcion,
+      precio_base !== undefined ? parseFloat(precio_base) : null,
+      imagen_url,
+      disponible,
+      categoria_id,
+      id
+    ];
     const resultado = await pool.query(query, valores);
 
     if (resultado.rows.length === 0) {
@@ -150,7 +156,7 @@ async function eliminar(req, res, id) {
 
     responder(res, 200, {
       success: true,
-      mensaje: `Producto #${id} (${resultado.rows[0].nombre}) eliminado exitosamente de la base de datos`,
+      mensaje: `Producto #${id} (${resultado.rows[0].nombre}) eliminado exitosamente de PostgreSQL`,
       data: resultado.rows[0]
     });
   } catch (err) {

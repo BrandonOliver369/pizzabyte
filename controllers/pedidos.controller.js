@@ -1,11 +1,12 @@
 /**
  * ==============================================================================
- * CONTROLADOR 4: PEDIDOS / COMANDAS KDS (CRUD)
+ * CONTROLADOR 4: PEDIDOS Y COMANDAS KDS (CRUD)
  * ==============================================================================
- * Operaciones CRUD completas sobre las tablas:
- * - 'pizzabyte_core.pedidos'
- * - 'pizzabyte_core.pedido_detalles'
- * - 'pizzabyte_core.vista_kds_cocina'
+ * Operaciones CRUD completas sobre la tabla 'pizzabyte_core.pedidos'
+ * y sus tablas asociadas de detalle y pago bajo transacciones ACID.
+ * Columnas exactas del esquema normalizado 3NF:
+ * id, folio_comanda, cliente_id, origen_pedido, tipo_entrega, direccion_entrega_id,
+ * notas_cocina, subtotal, monto_descuento, total, estado_id, cupon_id, creado_en, actualizado_en
  */
 
 const { pool } = require('../db');
@@ -22,50 +23,35 @@ async function listar(req, res) {
       SELECT 
         p.id,
         p.folio_comanda,
-        COALESCE(u.nombre_completo, 'Cliente Web') AS "clienteNombre",
-        COALESCE(u.email, 'correo@cliente.com') AS "correoCliente",
+        COALESCE(u.nombre_completo, 'Cliente General') AS "clienteNombre",
+        COALESCE(u.email, 'sin-correo@pizzabyte.com') AS "correoCliente",
         u.telefono AS "clienteTelefono",
         p.origen_pedido AS "origen",
         p.tipo_entrega AS "tipoEntrega",
-        CONCAT(du.calle_numero, ', ', col.nombre) AS "direccionEntrega",
         p.notas_cocina AS "notasCocina",
         ep.codigo AS "estado",
         ep.nombre AS "estadoNombre",
-        ep.orden_secuencia AS "ordenSecuencia",
-        p.descuento_aplicado,
-        p.costo_envio,
-        p.fecha_creacion,
-        to_char(p.fecha_creacion, 'DD Mon, HH24:MI') AS "fechaFormato",
+        p.subtotal,
+        p.monto_descuento,
+        p.total,
+        p.creado_en AS "fechaCreacion",
+        to_char(p.creado_en, 'DD Mon, HH24:MI') AS "fechaFormato",
         COALESCE(
           (SELECT pr.nombre FROM pedido_detalles pd JOIN productos pr ON pd.producto_id = pr.id WHERE pd.pedido_id = p.id LIMIT 1),
-          'Pizza Personalizada Byte'
+          'Pizza Especial PizzaByte'
         ) AS "saborPizza",
         COALESCE(
           (SELECT t.nombre FROM pedido_detalles pd JOIN tamanos t ON pd.tamano_id = t.id WHERE pd.pedido_id = p.id LIMIT 1),
-          'Grande Familiar'
+          'Familiar Grande'
         ) AS "tamano",
         COALESCE(
-          (SELECT SUM(pd.cantidad * pd.precio_unitario) FROM pedido_detalles pd WHERE pd.pedido_id = p.id),
-          14.50
-        ) - p.descuento_aplicado + p.costo_envio AS "precioTotal",
-        COALESCE(
           (SELECT mp.codigo FROM transacciones_pago tp JOIN metodos_pago mp ON tp.metodo_pago_id = mp.id WHERE tp.pedido_id = p.id LIMIT 1),
-          'EFECTIVO'
-        ) AS "metodoPago",
-        COALESCE(
-          (SELECT tp_pay.id_transaccion_paypal FROM transacciones_pago tp JOIN transacciones_paypal tp_pay ON tp.id = tp_pay.transaccion_id WHERE tp.pedido_id = p.id LIMIT 1),
-          null
-        ) AS "idTransaccionPaypal",
-        COALESCE(
-          (SELECT est.codigo FROM transacciones_pago tp JOIN estados_pago est ON tp.estado_pago_id = est.id WHERE tp.pedido_id = p.id LIMIT 1),
-          'PAGADO'
-        ) AS "estadoPago"
+          'TARJETA'
+        ) AS "metodoPago"
       FROM pedidos p
       JOIN estados_pedido ep ON p.estado_id = ep.id
       LEFT JOIN usuarios u ON p.cliente_id = u.id
-      LEFT JOIN direcciones_usuario du ON p.direccion_id = du.id
-      LEFT JOIN colonias col ON du.colonia_id = col.id
-      ORDER BY p.fecha_creacion DESC
+      ORDER BY p.creado_en DESC
     `;
     const resultado = await pool.query(query);
     responder(res, 200, {
@@ -78,7 +64,7 @@ async function listar(req, res) {
   }
 }
 
-// 2. READ ONE - Obtener comanda con sus productos y extras
+// 2. READ ONE - Obtener comanda con sus productos y desglose
 async function obtenerPorId(req, res, id) {
   try {
     const pQuery = `
@@ -96,7 +82,7 @@ async function obtenerPorId(req, res, id) {
 
     const itemsQuery = `
       SELECT pd.id, pr.nombre AS producto_nombre, t.nombre AS tamano_nombre,
-             pd.cantidad, pd.precio_unitario, (pd.cantidad * pd.precio_unitario) AS subtotal
+             pd.cantidad, pd.precio_unitario, pd.importe_subtotal
       FROM pedido_detalles pd
       JOIN productos pr ON pd.producto_id = pr.id
       JOIN tamanos t ON pd.tamano_id = t.id
@@ -104,8 +90,21 @@ async function obtenerPorId(req, res, id) {
     `;
     const itemsRes = await pool.query(itemsQuery, [id]);
 
+    const pagosQuery = `
+      SELECT tp.id, tp.monto, tp.moneda, tp.fecha_transaccion,
+             mp.codigo AS metodo_pago, ep.codigo AS estado_pago,
+             tpay.id_transaccion_paypal
+      FROM transacciones_pago tp
+      JOIN metodos_pago mp ON tp.metodo_pago_id = mp.id
+      JOIN estados_pago ep ON tp.estado_pago_id = ep.id
+      LEFT JOIN transacciones_paypal tpay ON tp.id = tpay.transaccion_id
+      WHERE tp.pedido_id = $1
+    `;
+    const pagosRes = await pool.query(pagosQuery, [id]);
+
     const pedido = pRes.rows[0];
     pedido.detalles = itemsRes.rows;
+    pedido.transacciones = pagosRes.rows;
 
     responder(res, 200, { success: true, data: pedido });
   } catch (err) {
@@ -113,7 +112,7 @@ async function obtenerPorId(req, res, id) {
   }
 }
 
-// 3. CREATE - Insertar un nuevo pedido completo
+// 3. CREATE - Insertar un nuevo pedido completo bajo transacción ACID
 async function crear(req, res, body) {
   const client = await pool.connect();
   try {
@@ -126,9 +125,14 @@ async function crear(req, res, body) {
     const estRes = await client.query('SELECT id FROM estados_pedido WHERE codigo = $1 LIMIT 1', [estado_codigo || 'CONFIRMADO']);
     const estadoId = estRes.rows[0] ? estRes.rows[0].id : 2;
 
+    const cant = cantidad || 1;
+    const precio = precio_unitario ? parseFloat(precio_unitario) : 14.50;
+    const subtotal = cant * precio;
+    const total = subtotal;
+
     const pQuery = `
-      INSERT INTO pedidos (folio_comanda, cliente_id, origen_pedido, tipo_entrega, notas_cocina, estado_id, cupon_id)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      INSERT INTO pedidos (folio_comanda, cliente_id, origen_pedido, tipo_entrega, notas_cocina, subtotal, total, estado_id, cupon_id)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       RETURNING *
     `;
     const pRes = await client.query(pQuery, [
@@ -137,6 +141,8 @@ async function crear(req, res, body) {
       origen_pedido || 'WEB',
       tipo_entrega || 'A_DOMICILIO',
       notas_cocina || 'Sin notas especiales',
+      subtotal,
+      total,
       estadoId,
       cupon_id || null
     ]);
@@ -148,12 +154,11 @@ async function crear(req, res, body) {
       VALUES ($1, $2, $3, $4, $5)
       RETURNING *
     `;
-    const precio = precio_unitario || 14.50;
     const dRes = await client.query(dQuery, [
       nuevoPedido.id,
       producto_id || 1,
       tamano_id || 3,
-      cantidad || 1,
+      cant,
       precio
     ]);
 
@@ -166,14 +171,14 @@ async function crear(req, res, body) {
       VALUES ($1, $2, 2, $3)
       RETURNING *
     `;
-    const tpRes = await client.query(tpQuery, [nuevoPedido.id, metodoId, precio]);
+    const tpRes = await client.query(tpQuery, [nuevoPedido.id, metodoId, total]);
 
     // Si es PayPal, registrar en transacciones_paypal
     if (metodo_pago_codigo === 'PAYPAL' || id_transaccion_paypal) {
       await client.query(`
         INSERT INTO transacciones_paypal (transaccion_id, id_transaccion_paypal)
         VALUES ($1, $2)
-      `, [tpRes.rows[0].id, id_transaccion_paypal || ('PAYID-' + Math.floor(100000 + Math.random() * 900000))]);
+      `, [tpRes.rows[0].id, id_transaccion_paypal || ('PAYID-' + Date.now())]);
     }
 
     await client.query('COMMIT');
@@ -206,7 +211,8 @@ async function actualizar(req, res, id, body) {
     const query = `
       UPDATE pedidos
       SET estado_id = COALESCE($1, estado_id),
-          notas_cocina = COALESCE($2, notas_cocina)
+          notas_cocina = COALESCE($2, notas_cocina),
+          actualizado_en = CURRENT_TIMESTAMP
       WHERE id = $3
       RETURNING *
     `;
