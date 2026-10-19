@@ -43,7 +43,12 @@ public class DbStatusController {
                 "/api/ingredientes (GET, POST, PUT, DELETE)",
                 "/api/cupones (GET, POST, PUT, DELETE)",
                 "/api/pedidos (GET, POST, PUT, PATCH, DELETE)",
-                "/api/usuarios (GET, POST, PUT, DELETE)"
+                "/api/usuarios (GET, POST, PUT, DELETE)",
+                "/api/roles (GET, POST, PUT, DELETE)",
+                "/api/categorias (GET, POST, PUT, DELETE)",
+                "/api/tamanos (GET, POST, PUT, DELETE)",
+                "/api/metodos-pago (GET, POST, PUT, DELETE)",
+                "/api/ciudades (GET, POST, PUT, DELETE)"
         ));
         response.put("estado", conectado ? "OPERATIVO_CONECTADO" : "ERROR_CONEXION");
 

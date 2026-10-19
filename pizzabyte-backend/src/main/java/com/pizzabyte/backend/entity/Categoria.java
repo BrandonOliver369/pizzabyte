@@ -17,7 +17,7 @@ public class Categoria implements Serializable {
     @Column(columnDefinition = "TEXT")
     private String descripcion;
 
-    @Column(length = 50)
+    @Transient
     private String icono;
 
     private Boolean activo = true;
