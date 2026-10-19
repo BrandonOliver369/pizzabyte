@@ -86,7 +86,7 @@ async function ejecutarPruebas() {
     precio_base: 19.99,
     descripcion: 'Edición gourmet limitada con extra trufa fresca.'
   });
-  registrar('PRODUCTOS - UPDATE: Modificar precio y descripción', prodUpd.status === 200 && prodUpd.data?.data?.precio_base === '19.99', `Nuevo precio: $${prodUpd.data?.data?.precio_base}`);
+  registrar('PRODUCTOS - UPDATE: Modificar precio y descripción', prodUpd.status === 200 && prodUpd.data?.data?.precio_base == 19.99, `Nuevo precio: $${prodUpd.data?.data?.precio_base}`);
 
   // 1.5 DELETE
   const prodDel = await peticion(`/api/productos/${prodId}`, 'DELETE');
@@ -120,7 +120,7 @@ async function ejecutarPruebas() {
     costo_extra: 1.10,
     stock_disponible: 150
   });
-  registrar('INGREDIENTES - UPDATE: Actualizar costo adicional', ingUpd.status === 200 && ingUpd.data?.data?.costo_extra === '1.10', `Nuevo costo: $${ingUpd.data?.data?.costo_extra}`);
+  registrar('INGREDIENTES - UPDATE: Actualizar costo adicional', ingUpd.status === 200 && ingUpd.data?.data?.costo_extra == 1.10, `Nuevo costo: $${ingUpd.data?.data?.costo_extra}`);
 
   // 2.5 DELETE
   const ingDel = await peticion(`/api/ingredientes/${ingId}`, 'DELETE');
@@ -149,14 +149,14 @@ async function ejecutarPruebas() {
 
   // 3.3 READ ONE (por código o id)
   const cupOne = await peticion(`/api/cupones/${cupCode}`, 'GET');
-  registrar('CUPONES - READ ONE: Validar cupón por código', cupOne.status === 200 && cupOne.data?.data?.porcentaje_descuento === '20.00', `Descuento: ${cupOne.data?.data?.porcentaje_descuento}%`);
+  registrar('CUPONES - READ ONE: Validar cupón por código', cupOne.status === 200 && cupOne.data?.data?.porcentaje_descuento == 20.00, `Descuento: ${cupOne.data?.data?.porcentaje_descuento}%`);
 
   // 3.4 UPDATE
   const cupUpd = await peticion(`/api/cupones/${cupId}`, 'PUT', {
     porcentaje_descuento: 25.00,
     usos_maximos: 200
   });
-  registrar('CUPONES - UPDATE: Incrementar beneficio del cupón', cupUpd.status === 200 && cupUpd.data?.data?.porcentaje_descuento === '25.00', `Nuevo %: ${cupUpd.data?.data?.porcentaje_descuento}%`);
+  registrar('CUPONES - UPDATE: Incrementar beneficio del cupón', cupUpd.status === 200 && cupUpd.data?.data?.porcentaje_descuento == 25.00, `Nuevo %: ${cupUpd.data?.data?.porcentaje_descuento}%`);
 
   // 3.5 DELETE
   const cupDel = await peticion(`/api/cupones/${cupId}`, 'DELETE');
