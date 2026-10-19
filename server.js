@@ -5,6 +5,13 @@ const path = require('path');
 const crypto = require('crypto');
 const db = require('./db');
 
+// Controladores CRUD de PostgreSQL
+const productosCtrl = require('./controllers/productos.controller');
+const ingredientesCtrl = require('./controllers/ingredientes.controller');
+const cuponesCtrl = require('./controllers/cupones.controller');
+const pedidosCtrl = require('./controllers/pedidos.controller');
+const usuariosCtrl = require('./controllers/usuarios.controller');
+
 const PORT = 8080;
 const BREVO_API_KEY = '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';
 const BREVO_SENDER = 'brandooliver4@gmail.com';
@@ -231,7 +238,7 @@ const server = http.createServer(async (req, res) => {
   const origin = req.headers.origin || 'http://localhost:4200';
   res.setHeader('Access-Control-Allow-Origin', origin);
   res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, Cookie');
   res.setHeader('Access-Control-Expose-Headers', 'Set-Cookie');
 
@@ -240,6 +247,19 @@ const server = http.createServer(async (req, res) => {
     res.end();
     return;
   }
+
+  // Helper para leer body JSON asíncronamente
+  const leerBody = () => new Promise((resolve) => {
+    let raw = '';
+    req.on('data', chunk => { raw += chunk; });
+    req.on('end', () => {
+      try {
+        resolve(raw ? JSON.parse(raw) : {});
+      } catch {
+        resolve({});
+      }
+    });
+  });
 
   // 0. GET /api/db/status (Verificación de Conexión a PostgreSQL 18)
   if (req.method === 'GET' && req.url === '/api/db/status') {
@@ -252,9 +272,130 @@ const server = http.createServer(async (req, res) => {
       esquema: process.env.DB_SCHEMA || 'pizzabyte_core',
       host: `${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || '5432'}`,
       normalizacion: '3NF (Tercera Forma Normal)',
+      controladoresCrud: [
+        '/api/productos (GET, POST, PUT, DELETE)',
+        '/api/ingredientes (GET, POST, PUT, DELETE)',
+        '/api/cupones (GET, POST, PUT, DELETE)',
+        '/api/pedidos (GET, POST, PUT, DELETE)',
+        '/api/usuarios (GET, POST, PUT, DELETE)'
+      ],
       estado: isConn ? 'OPERATIVO_CONECTADO' : 'MODO_FALLBACK_MEMORIA'
     }));
     return;
+  }
+
+  // ============================================================================
+  // ENRUTADOR CRUD PARA LOS 5 CONTROLADORES DE POSTGRESQL
+  // ============================================================================
+
+  // 1. CONTROLADOR CRUD: PRODUCTOS (/api/productos)
+  if (req.url === '/api/productos' && req.method === 'GET') {
+    return productosCtrl.listar(req, res);
+  }
+  if (req.url.startsWith('/api/productos/') && req.method === 'GET') {
+    const id = parseInt(req.url.split('/')[3], 10);
+    return productosCtrl.obtenerPorId(req, res, id);
+  }
+  if (req.url === '/api/productos' && req.method === 'POST') {
+    const body = await leerBody();
+    return productosCtrl.crear(req, res, body);
+  }
+  if (req.url.startsWith('/api/productos/') && (req.method === 'PUT' || req.method === 'PATCH')) {
+    const id = parseInt(req.url.split('/')[3], 10);
+    const body = await leerBody();
+    return productosCtrl.actualizar(req, res, id, body);
+  }
+  if (req.url.startsWith('/api/productos/') && req.method === 'DELETE') {
+    const id = parseInt(req.url.split('/')[3], 10);
+    return productosCtrl.eliminar(req, res, id);
+  }
+
+  // 2. CONTROLADOR CRUD: INGREDIENTES (/api/ingredientes)
+  if (req.url === '/api/ingredientes' && req.method === 'GET') {
+    return ingredientesCtrl.listar(req, res);
+  }
+  if (req.url.startsWith('/api/ingredientes/') && req.method === 'GET') {
+    const id = parseInt(req.url.split('/')[3], 10);
+    return ingredientesCtrl.obtenerPorId(req, res, id);
+  }
+  if (req.url === '/api/ingredientes' && req.method === 'POST') {
+    const body = await leerBody();
+    return ingredientesCtrl.crear(req, res, body);
+  }
+  if (req.url.startsWith('/api/ingredientes/') && (req.method === 'PUT' || req.method === 'PATCH')) {
+    const id = parseInt(req.url.split('/')[3], 10);
+    const body = await leerBody();
+    return ingredientesCtrl.actualizar(req, res, id, body);
+  }
+  if (req.url.startsWith('/api/ingredientes/') && req.method === 'DELETE') {
+    const id = parseInt(req.url.split('/')[3], 10);
+    return ingredientesCtrl.eliminar(req, res, id);
+  }
+
+  // 3. CONTROLADOR CRUD: CUPONES DE DESCUENTO (/api/cupones)
+  if (req.url === '/api/cupones' && req.method === 'GET') {
+    return cuponesCtrl.listar(req, res);
+  }
+  if (req.url.startsWith('/api/cupones/') && req.method === 'GET') {
+    const id = req.url.split('/')[3];
+    return cuponesCtrl.obtenerPorId(req, res, id);
+  }
+  if (req.url === '/api/cupones' && req.method === 'POST') {
+    const body = await leerBody();
+    return cuponesCtrl.crear(req, res, body);
+  }
+  if (req.url.startsWith('/api/cupones/') && (req.method === 'PUT' || req.method === 'PATCH')) {
+    const id = parseInt(req.url.split('/')[3], 10);
+    const body = await leerBody();
+    return cuponesCtrl.actualizar(req, res, id, body);
+  }
+  if (req.url.startsWith('/api/cupones/') && req.method === 'DELETE') {
+    const id = parseInt(req.url.split('/')[3], 10);
+    return cuponesCtrl.eliminar(req, res, id);
+  }
+
+  // 4. CONTROLADOR CRUD: PEDIDOS / COMANDAS (/api/pedidos)
+  if (req.url === '/api/pedidos' && req.method === 'GET') {
+    return pedidosCtrl.listar(req, res);
+  }
+  if (req.url.startsWith('/api/pedidos/') && req.method === 'GET' && !req.url.endsWith('/estado')) {
+    const id = parseInt(req.url.split('/')[3], 10);
+    return pedidosCtrl.obtenerPorId(req, res, id);
+  }
+  if (req.url === '/api/pedidos' && req.method === 'POST') {
+    const body = await leerBody();
+    return pedidosCtrl.crear(req, res, body);
+  }
+  if (req.url.startsWith('/api/pedidos/') && (req.method === 'PUT' || req.method === 'PATCH')) {
+    const id = parseInt(req.url.split('/')[3], 10);
+    const body = await leerBody();
+    return pedidosCtrl.actualizar(req, res, id, body);
+  }
+  if (req.url.startsWith('/api/pedidos/') && req.method === 'DELETE') {
+    const id = parseInt(req.url.split('/')[3], 10);
+    return pedidosCtrl.eliminar(req, res, id);
+  }
+
+  // 5. CONTROLADOR CRUD: USUARIOS (/api/usuarios)
+  if (req.url === '/api/usuarios' && req.method === 'GET') {
+    return usuariosCtrl.listar(req, res);
+  }
+  if (req.url.startsWith('/api/usuarios/') && req.method === 'GET') {
+    const id = parseInt(req.url.split('/')[3], 10);
+    return usuariosCtrl.obtenerPorId(req, res, id);
+  }
+  if (req.url === '/api/usuarios' && req.method === 'POST') {
+    const body = await leerBody();
+    return usuariosCtrl.crear(req, res, body);
+  }
+  if (req.url.startsWith('/api/usuarios/') && (req.method === 'PUT' || req.method === 'PATCH')) {
+    const id = parseInt(req.url.split('/')[3], 10);
+    const body = await leerBody();
+    return usuariosCtrl.actualizar(req, res, id, body);
+  }
+  if (req.url.startsWith('/api/usuarios/') && req.method === 'DELETE') {
+    const id = parseInt(req.url.split('/')[3], 10);
+    return usuariosCtrl.eliminar(req, res, id);
   }
 
   // Rutas de Autenticación
