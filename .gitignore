@@ -44,7 +44,16 @@ __screenshots__/
 Thumbs.db
 ~$*
 
-# Temporary files
+# Temporary & Generated Documents (Word, etc.)
+*.docx
+*.doc
 temp_sessions/
-test*.docx
+
+# Scripts de pruebas y utilerías de evaluación
+test_crud_controllers.js
+generate_manual_docx.py
+verify_session.ps1
+verify_session.sh
+*.log
+
 .env
