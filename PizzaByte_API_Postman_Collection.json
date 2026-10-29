@@ -1,0 +1,552 @@
+{
+  "info": {
+    "_postman_id": "pizzabyte-api-collection-2026",
+    "name": "PizzaByte v3.0 - API REST Spring Boot & PostgreSQL",
+    "description": "Colección completa para evaluación académica de los 5 controladores CRUD y el módulo de Derechos ARCO (LFPDPPP). Compatible con localhost y dominio local (api.pizzabyte.local).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "domainUrl",
+      "value": "http://api.pizzabyte.local:8080",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "0. Diagnóstico del Sistema",
+      "item": [
+        {
+          "name": "Verificar Estado de Conexión a PostgreSQL",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/db/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "db", "status"]
+            },
+            "description": "Verifica en tiempo real que Spring Boot esté conectado a PostgreSQL 18 (pizzabyte_db.pizzabyte_core) y lista los módulos activos."
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Controlador de Productos (CRUD)",
+      "item": [
+        {
+          "name": "1.1 CREATE - Crear Pizza / Producto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoria_id\": 1,\n  \"nombre\": \"Pizza Trufa Negra & Funghi Postman\",\n  \"descripcion\": \"Champiñones salteados, aceite de trufa blanca y fior di latte.\",\n  \"precio_base\": 18.50,\n  \"imagen_url\": \"trufa_postman.jpg\",\n  \"disponible\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/productos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos"]
+            }
+          }
+        },
+        {
+          "name": "1.2 READ ALL - Listar Catálogo Completo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/productos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos"]
+            }
+          }
+        },
+        {
+          "name": "1.3 READ ONE - Obtener Pizza por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/productos/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos", "1"]
+            }
+          }
+        },
+        {
+          "name": "1.4 UPDATE - Modificar Precio y Descripción",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"precio_base\": 19.99,\n  \"descripcion\": \"Edición especial de autor con extra queso mozzarella.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/productos/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos", "1"]
+            }
+          }
+        },
+        {
+          "name": "1.5 DELETE - Eliminar Pizza por ID",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/productos/10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos", "10"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Controlador de Ingredientes (CRUD)",
+      "item": [
+        {
+          "name": "2.1 CREATE - Registrar Ingrediente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Queso Parmigiano Reggiano DOP\",\n  \"costo_extra\": 2.50,\n  \"stock_disponible\": 150,\n  \"unidad_medida\": \"porción 50g\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ingredientes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ingredientes"]
+            }
+          }
+        },
+        {
+          "name": "2.2 READ ALL - Listar Inventario de Ingredientes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ingredientes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ingredientes"]
+            }
+          }
+        },
+        {
+          "name": "2.3 READ ONE - Obtener Ingrediente por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ingredientes/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ingredientes", "1"]
+            }
+          }
+        },
+        {
+          "name": "2.4 UPDATE - Actualizar Costo y Stock",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"costo_extra\": 1.75,\n  \"stock_disponible\": 300\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ingredientes/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ingredientes", "1"]
+            }
+          }
+        },
+        {
+          "name": "2.5 DELETE - Eliminar Ingrediente",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ingredientes/14",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ingredientes", "14"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Controlador de Cupones (CRUD)",
+      "item": [
+        {
+          "name": "3.1 CREATE - Crear Cupón Promocional",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"PROFEPOSTMAN\",\n  \"porcentaje_descuento\": 25.00,\n  \"monto_minimo_compra\": 10.00,\n  \"usos_maximos\": 50,\n  \"activo\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cupones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cupones"]
+            }
+          }
+        },
+        {
+          "name": "3.2 READ ALL - Listar Cupones Activos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cupones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cupones"]
+            }
+          }
+        },
+        {
+          "name": "3.3 READ ONE - Validar Cupón por Código o ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cupones/PROFE2026",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cupones", "PROFE2026"]
+            }
+          }
+        },
+        {
+          "name": "3.4 UPDATE - Modificar Descuento o Usos",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"porcentaje_descuento\": 30.00,\n  \"usos_maximos\": 200\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cupones/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cupones", "1"]
+            }
+          }
+        },
+        {
+          "name": "3.5 DELETE - Dar de Baja Cupón",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cupones/8",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cupones", "8"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Controlador de Pedidos KDS (CRUD)",
+      "item": [
+        {
+          "name": "4.1 CREATE - Registrar Pedido / Comanda",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cliente_id\": 2,\n  \"origen_pedido\": \"WEB\",\n  \"tipo_entrega\": \"A_DOMICILIO\",\n  \"notas_cocina\": \"Sin orégano, masa delgada bien cocida\",\n  \"estado_codigo\": \"CONFIRMADO\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pedidos"]
+            }
+          }
+        },
+        {
+          "name": "4.2 READ ALL - Listar Comandas Tablero KDS",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pedidos"]
+            }
+          }
+        },
+        {
+          "name": "4.3 READ ONE - Obtener Comanda por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pedidos", "1"]
+            }
+          }
+        },
+        {
+          "name": "4.4 UPDATE - Transicionar Estado en Cocina (Kanban)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado_codigo\": \"EN_HORNO\",\n  \"notas_cocina\": \"Ingresada a horno de piedra por pizzero\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pedidos", "1"]
+            }
+          }
+        },
+        {
+          "name": "4.5 DELETE - Cancelar / Eliminar Comanda",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos/6",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pedidos", "6"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Controlador de Usuarios (CRUD)",
+      "item": [
+        {
+          "name": "5.1 CREATE - Registrar Usuario (Hash SHA-256)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"profesor_postman\",\n  \"email\": \"profesor_postman@pizzabyte.edu\",\n  \"password\": \"evaluacion2026\",\n  \"nombre_completo\": \"Profesor Evaluador Postman\",\n  \"telefono\": \"7715554433\",\n  \"rol_codigo\": \"ADMIN\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios"]
+            }
+          }
+        },
+        {
+          "name": "5.2 READ ALL - Listar Usuarios Registrados",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios"]
+            }
+          }
+        },
+        {
+          "name": "5.3 READ ONE - Consultar Perfil por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios/2",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios", "2"]
+            }
+          }
+        },
+        {
+          "name": "5.4 UPDATE - Modificar Datos de Usuario",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre_completo\": \"Brandon Oliver (Actualizado)\",\n  \"telefono\": \"7719998877\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios/2",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios", "2"]
+            }
+          }
+        },
+        {
+          "name": "5.5 DELETE - Eliminar Cuenta de Usuario",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios/999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios", "999"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Módulo Derechos ARCO (LFPDPPP)",
+      "item": [
+        {
+          "name": "6.1 ACCESO (A) - Obtener Expediente Integral",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/arco/usuarios/2/acceso",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "arco", "usuarios", "2", "acceso"]
+            },
+            "description": "Entrega al titular todos los datos personales, historial de compras y preferencias registradas en la base de datos (Art. 23 LFPDPPP)."
+          }
+        },
+        {
+          "name": "6.2 RECTIFICACIÓN (R) - Corregir Datos Inexactos",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre_completo\": \"Brandon Oliver Hernández\",\n  \"telefono\": \"7711234567\",\n  \"email\": \"brandooliver4@gmail.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/arco/usuarios/2/rectificacion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "arco", "usuarios", "2", "rectificacion"]
+            },
+            "description": "Permite rectificar datos personales inexactos o desactualizados y genera folio de auditoría legal (Art. 24 LFPDPPP)."
+          }
+        },
+        {
+          "name": "6.3 OPOSICIÓN (O) - Oponerse a Publicidad / Marketing",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"oponerse_marketing\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/arco/usuarios/2/oposicion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "arco", "usuarios", "2", "oposicion"]
+            },
+            "description": "Revoca el consentimiento para finalidades secundarias como envío de promociones por correo masivo de Brevo (Art. 27 LFPDPPP)."
+          }
+        },
+        {
+          "name": "6.4 CANCELACIÓN (C) - Bloqueo Legal y Supresión",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Baja definitiva del servicio por solicitud expresa del titular.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/arco/usuarios/2/cancelacion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "arco", "usuarios", "2", "cancelacion"]
+            },
+            "description": "Ejecuta el bloqueo de cuenta y disociación de datos para cesar su tratamiento, conservándolos solo por plazos de ley (Art. 25 LFPDPPP)."
+          }
+        },
+        {
+          "name": "6.5 AUDITORÍA ARCO - Listar Solicitudes Legales",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/arco/solicitudes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "arco", "solicitudes"]
+            },
+            "description": "Bitácora oficial de todas las solicitudes ARCO recibidas y atendidas con sus folios y fechas de resolución."
+          }
+        }
+      ]
+    }
+  ]
+}

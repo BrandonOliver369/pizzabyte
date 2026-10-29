@@ -39,6 +39,8 @@ CREATE TABLE usuarios (
         CHECK (proveedor_auth IN ('LOCAL', 'GOOGLE', 'FACEBOOK')),
     avatar_url TEXT,
     activo BOOLEAN DEFAULT TRUE,
+    acepta_marketing BOOLEAN DEFAULT TRUE,
+    bloqueado_arco BOOLEAN DEFAULT FALSE,
     fecha_creacion TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     fecha_actualizacion TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
@@ -322,6 +324,25 @@ LEFT JOIN pedido_detalles pd ON p.id = pd.pedido_id
 WHERE ep.codigo NOT IN ('ENTREGADO', 'CANCELADO')
 GROUP BY p.id, ep.id, u.id, du.id, col.id, mp.codigo, tp_pay.id_transaccion_paypal, est_pago.codigo
 ORDER BY p.fecha_creacion ASC;
+
+-- ============================================================================
+-- 8. GOBERNANZA DE DATOS Y DERECHOS ARCO (LFPDPPP)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS solicitudes_arco (
+    id BIGSERIAL PRIMARY KEY,
+    folio VARCHAR(36) UNIQUE NOT NULL,
+    usuario_id BIGINT NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+    tipo_derecho VARCHAR(20) NOT NULL CHECK (tipo_derecho IN ('ACCESO', 'RECTIFICACION', 'CANCELACION', 'OPOSICION')),
+    estado VARCHAR(20) NOT NULL DEFAULT 'ATENDIDA' CHECK (estado IN ('PENDIENTE', 'EN_PROCESO', 'ATENDIDA', 'RECHAZADA')),
+    motivo TEXT,
+    datos_especificos TEXT,
+    fecha_solicitud TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    fecha_resolucion TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_arco_usuario ON solicitudes_arco(usuario_id);
+CREATE INDEX IF NOT EXISTS idx_arco_folio ON solicitudes_arco(folio);
 
 -- ============================================================================
 -- DATOS SEMILLA INICIALES (SEEDS)

@@ -15,7 +15,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/db/status")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "*")
 public class DbStatusController {
 
     @Autowired
@@ -48,8 +48,10 @@ public class DbStatusController {
                 "/api/categorias (GET, POST, PUT, DELETE)",
                 "/api/tamanos (GET, POST, PUT, DELETE)",
                 "/api/metodos-pago (GET, POST, PUT, DELETE)",
-                "/api/ciudades (GET, POST, PUT, DELETE)"
+                "/api/ciudades (GET, POST, PUT, DELETE)",
+                "/api/arco (ACCESO, RECTIFICACION, CANCELACION, OPOSICION)"
         ));
+        response.put("moduloArco", "OPERATIVO (LFPDPPP - Acceso, Rectificación, Cancelación, Oposición)");
         response.put("estado", conectado ? "OPERATIVO_CONECTADO" : "ERROR_CONEXION");
 
         return ResponseEntity.ok(response);

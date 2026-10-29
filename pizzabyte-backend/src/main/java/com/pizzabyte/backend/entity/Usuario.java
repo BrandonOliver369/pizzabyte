@@ -38,6 +38,12 @@ public class Usuario implements Serializable {
 
     private Boolean activo = true;
 
+    @Column(name = "acepta_marketing")
+    private Boolean aceptaMarketing = true;
+
+    @Column(name = "bloqueado_arco")
+    private Boolean bloqueadoArco = false;
+
     @Column(name = "creado_en", insertable = false, updatable = false)
     private OffsetDateTime creadoEn;
 
@@ -72,6 +78,12 @@ public class Usuario implements Serializable {
 
     public Boolean getActivo() { return activo; }
     public void setActivo(Boolean activo) { this.activo = activo; }
+
+    public Boolean getAceptaMarketing() { return aceptaMarketing; }
+    public void setAceptaMarketing(Boolean aceptaMarketing) { this.aceptaMarketing = aceptaMarketing; }
+
+    public Boolean getBloqueadoArco() { return bloqueadoArco; }
+    public void setBloqueadoArco(Boolean bloqueadoArco) { this.bloqueadoArco = bloqueadoArco; }
 
     public OffsetDateTime getCreadoEn() { return creadoEn; }
     public void setCreadoEn(OffsetDateTime creadoEn) { this.creadoEn = creadoEn; }
