@@ -49,6 +49,9 @@ Thumbs.db
 *.doc
 temp_sessions/
 
+# Manuales y documentación local de evaluación
+MANUAL_POSTMAN_Y_PLAN_B_TERMINAL.md
+
 # Scripts de pruebas y utilerías de evaluación
 test_crud_controllers.js
 generate_manual_docx.py
